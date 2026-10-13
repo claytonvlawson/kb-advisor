@@ -6,7 +6,7 @@ Parent Advisor, which turns an Obsidian research vault (~1300 notes) into a
 public RAG agent with deterministic crisis routing and linkable citations.
 
 The goal of this template: **drop in a client's PDFs, write a persona, get a
-cited advisor API.**
+cited advisor API** (and optionally a front-end widget).
 
 ```
   [1] PDFs / markdown        documents on your machine
@@ -29,7 +29,16 @@ cited advisor API.**
         |
         v
   [8] Caddy -> your front end          {id, answer, sources, citations}
+        |
+        |  [9] frontend/ (optional)     Vercel proxy + React widget
+        v                                     see frontend/README.md
 ```
+
+The optional `frontend/` directory holds the same-origin Vercel proxy pair
+(`api/chat.js`, `api/feedback.js`, with the bearer token server-side and
+per-IP rate limits), a drop-in React `AdvisorWidget.jsx` (persona as props),
+and `vercel.json` with `functions.maxDuration` set -- a production gap that
+surfaced as intermittent "spotty" failures. See frontend/README.md.
 
 ## What a client is
 
