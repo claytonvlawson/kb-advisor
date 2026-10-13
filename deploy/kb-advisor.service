@@ -1,0 +1,19 @@
+[Unit]
+Description=KB Advisor (BM25 + OpenRouter, per-client persona)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kb-advisor
+WorkingDirectory=/opt/kb-advisor
+EnvironmentFile=/etc/kb-advisor.env
+# ADVISOR_CLIENT set in the env file points at the deployed client config
+ExecStart=/usr/bin/python3 /opt/kb-advisor/kb/kb_server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

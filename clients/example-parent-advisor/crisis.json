@@ -1,0 +1,20 @@
+{
+  "patterns": [
+    "\\bwish(es|ed)?\\s+(he|she|they|i)\\s+(had\\s+)?never\\s+(been\\s+)?born\\b",
+    "\\bwants?\\s+to\\s+die\\b",
+    "\\bwant(s|ed)?\\s+to\\s+kill\\s+(myself|himself|herself|themselves)\\b",
+    "\\bkill(ing)?\\s+(myself|himself|herself|themselves)\\b",
+    "\\bsuicid(e|al)\\b",
+    "\\bself[\\s-]?harm\\b",
+    "\\b(cutting|cut)\\s+(himself|herself|themselves|myself)\\b",
+    "\\bno\\s+reason\\s+to\\s+live\\b",
+    "\\bend(ing)?\\s+(his|her|their|my)\\s+life\\b",
+    "\\bhurt(ing)?\\s+(himself|herself|themselves|myself)\\b",
+    "\\b(hitting|hurting|abusing)\\s+my\\s+(child|kid|son|daughter|baby)\\b",
+    "\\b(child|kid)\\s+abuse\\b",
+    "\\bnot\\s+safe\\s+at\\s+home\\b",
+    "\\bscared\\s+(he|she|they)\\s+(will|might|is going to)\\s+hurt\\b"
+  ],
+  "inject_source": "LanguageDeprivationAgent/01 Agent Scope and Guardrails.md",
+  "system_addendum": "If the parent's question suggests a child or teen is in danger, treat it as a safety conversation first. Lead with the crisis resources from the context clearly and calmly before anything else, and tell the parent this is urgent and they are not alone in it. Do not redirect a crisis into a research answer."
+}

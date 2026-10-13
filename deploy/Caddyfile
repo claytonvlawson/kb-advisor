@@ -1,0 +1,7 @@
+# Reverse proxy for one or more clients. Caddy terminates TLS and pools
+# backend connections; the server already handles the pooled-connection
+# 401 fix (close before reading the body).
+
+advisor.example.com {
+    reverse_proxy 127.0.0.1:8001
+}

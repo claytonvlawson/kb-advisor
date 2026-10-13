@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+*.pkl
+clients/*/index/
+clients/*/logs/
+kb.env
+.DS_Store

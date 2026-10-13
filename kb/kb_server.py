@@ -1,0 +1,462 @@
+#!/usr/bin/env python3
+"""kb_server.py -- generic knowledge-base advisor server.
+
+The production learnwithclay.ai Parent Advisor (parent_advisor_server.py)
+with the client-specific parts moved into a per-client config directory:
+persona, crisis trigger, and optional domain hooks (e.g. US-state location
+routing). Drop a new client = write a config dir + point ADVISOR_CLIENT at
+it. The RAG core (retrieval, citations, LLM routing) is untouched.
+
+CLIENT CONFIG (a directory, e.g. clients/<name>/):
+  system_prompt.md    persona; the client-specific guardrails, tone,
+                      terminology, referral rules
+  crisis.json         optional. {"patterns": [regex, ...],
+                      "inject_source": "path/in/vault.md",
+                      "system_addendum": "..."}
+                      Deterministic pre-retrieval force-inject, the
+                      production crisis design: match the user's words
+                      (not the corpus's vocabulary) and prepend the
+                      safety-note chunks regardless of BM25 score.
+  client_hooks.py     optional. A module with optional hooks:
+                        detect_location(question) -> loc | None
+                        location_note(loc, local, ask_where) -> str
+                        folder_prefix(state), same_state_folder(src, state)
+                        is_local_resource(source)
+                      Copy clients/example-parent-advisor/location.py as
+                      a starting point for US-state routing.
+  location.py / data files as the hooks need
+
+WHY A CONFIG-DRIVEN SPLIT (production lessons, 2026-09..10):
+  - Crisis handling is injection, not ranking: the guardrails note scored
+    16-24 against the deprivation literature's 64-78, so boosting never
+    won. A regex trigger is deterministic and offline testable.
+  - A false positive degrades gracefully (safety resources + the real
+    answer). A false negative fails silently -- see the eval TODO.
+  - Formatting invariants (no em dashes) are code, not prompt clauses.
+  - PARENT_SYSTEM in production is a hand-ported subset of the vault's
+    guardrails note and the two drift. Keeping the persona as a markdown
+    file next to the client config is the honest middle: one file to edit,
+    versioned with the code that enforces its invariants.
+
+Env (per deployment):
+  ADVISOR_CLIENT      client config dir (default: ./clients/default)
+  ADVISOR_TOKEN       bearer token; empty disables auth (dev only)
+  ADVISOR_HOST/PORT   default 127.0.0.1:8001
+  ADVISOR_VAULT       knowledge base dir (markdown notes)
+  ADVISOR_INDEX       BM25 pickle path
+  ADVISOR_TOP_K       default 5
+  ADVISOR_MAX_Q / ADVISOR_MAX_NOTE / ADVISOR_MAX_CITATIONS
+  ADVISOR_LOG_DIR     JSONL logs (qa, feedback, crisis)
+  OPENROUTER_*        see kb/llm_router.py
+
+Run:
+  ADVISOR_CLIENT=clients/example-parent-advisor \
+  ADVISOR_VAULT=clients/example-parent-advisor/vault \
+  ADVISOR_INDEX=clients/example-parent-advisor/index/bm25.pkl \
+  python3 kb_server.py
+"""
+import functools
+import importlib.util
+import json
+import os
+import re
+import sys
+import threading
+import time
+import uuid
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+# This file lives inside kb/, so plain imports work when run as a script.
+import citations
+import llm_router
+import retrieval
+
+HOST = os.environ.get("ADVISOR_HOST", "127.0.0.1")
+PORT = int(os.environ.get("ADVISOR_PORT", "8001"))
+TOKEN = os.environ.get("ADVISOR_TOKEN", "")
+MAX_Q = int(os.environ.get("ADVISOR_MAX_Q", "500"))
+MAX_NOTE = int(os.environ.get("ADVISOR_MAX_NOTE", "1000"))
+TOP_K = int(os.environ.get("ADVISOR_TOP_K", "5"))
+LOC_K = int(os.environ.get("ADVISOR_LOC_K", "3"))
+LOC_PROBE_K = int(os.environ.get("ADVISOR_LOC_PROBE_K", "15"))
+
+CLIENT_DIR = os.path.abspath(os.environ.get("ADVISOR_CLIENT", "clients/default"))
+VAULT_ROOT = os.path.abspath(os.environ.get("ADVISOR_VAULT", os.path.join(CLIENT_DIR, "vault")))
+INDEX_PATH = os.environ.get("ADVISOR_INDEX", os.path.join(CLIENT_DIR, "index", "bm25.pkl"))
+MAX_CITATIONS = int(os.environ.get("ADVISOR_MAX_CITATIONS", "6"))
+
+LOG_DIR = os.environ.get("ADVISOR_LOG_DIR", os.path.join(CLIENT_DIR, "logs"))
+QA_LOG = os.path.join(LOG_DIR, "qa_log.jsonl")
+FEEDBACK_LOG = os.path.join(LOG_DIR, "feedback.jsonl")
+CRISIS_LOG = os.path.join(LOG_DIR, "crisis_log.jsonl")
+os.makedirs(LOG_DIR, exist_ok=True)
+
+DEEP_HEALTH_QUESTION = os.environ.get("ADVISOR_DEEP_HEALTH_QUESTION", "what is this knowledge base about")
+
+
+# ---------------------------------------------------------------------------
+# Client config loading
+# ---------------------------------------------------------------------------
+def load_system_prompt(client_dir):
+    path = os.path.join(client_dir, "system_prompt.md")
+    if not os.path.exists(path):
+        raise RuntimeError("no system_prompt.md in %s -- a client config is "
+                            "not optional" % client_dir)
+    with open(path, "r", encoding="utf-8") as fh:
+        return fh.read().strip()
+
+
+def load_crisis_config(client_dir):
+    """Optional crisis.json -> {"patterns", "inject_source", "system_addendum"}.
+    Empty `patterns` = crisis path disabled (a scaffolded client starts
+    disabled; fill the patterns in when the domain needs a safety route)."""
+    path = os.path.join(client_dir, "crisis.json")
+    if not os.path.exists(path):
+        return None
+    with open(path, "r", encoding="utf-8") as fh:
+        cfg = json.load(fh)
+    if not cfg.get("patterns"):
+        return None
+    if not cfg.get("inject_source"):
+        raise RuntimeError("crisis.json has patterns but no inject_source -- "
+                           "which vault note should the crisis path prepend?")
+    return cfg
+
+
+def load_client_hooks(client_dir):
+    """Optional client_hooks.py -> module or None. The client dir goes on
+    sys.path first so a hooks module can import its own data modules
+    (e.g. location.py + us_places.json next to it)."""
+    path = os.path.join(client_dir, "client_hooks.py")
+    if not os.path.exists(path):
+        return None
+    if client_dir not in sys.path:
+        sys.path.insert(0, client_dir)
+    spec = importlib.util.spec_from_file_location("client_hooks", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+SYSTEM_PROMPT = load_system_prompt(CLIENT_DIR)
+CRISIS_CFG = load_crisis_config(CLIENT_DIR)
+HOOKS = load_client_hooks(CLIENT_DIR)
+
+_CRISIS_RE = re.compile("|".join(CRISIS_CFG["patterns"]), re.IGNORECASE) if CRISIS_CFG else None
+
+
+def is_crisis(question):
+    return bool(_CRISIS_RE and _CRISIS_RE.search(question))
+
+
+@functools.lru_cache(maxsize=1)
+def _crisis_chunks():
+    if not CRISIS_CFG:
+        return []
+    return [c for c in CHUNKS if c["source"] == CRISIS_CFG["inject_source"]]
+
+
+# ---------------------------------------------------------------------------
+# Index load (same startup contract as production: warn loudly when the
+# crisis note is missing from the index).
+# ---------------------------------------------------------------------------
+print("Loading the knowledge base index (%s)..." % INDEX_PATH, flush=True)
+CHUNKS, BM25 = retrieval.load_index(INDEX_PATH)
+print("Loaded %d chunks." % len(CHUNKS), flush=True)
+if CRISIS_CFG and not _crisis_chunks():
+    print("[kb-advisor] WARNING: crisis inject source %r not found in the index "
+          "-- the crisis path has nothing to inject. Check the vault."
+          % CRISIS_CFG["inject_source"], flush=True)
+print("Client config: %s" % CLIENT_DIR, flush=True)
+print("Logging exchanges to %s" % QA_LOG, flush=True)
+
+_log_lock = threading.Lock()
+
+
+def _append_jsonl(path, record):
+    try:
+        line = json.dumps(record, ensure_ascii=False)
+        with _log_lock:
+            with open(path, "a", encoding="utf-8") as fh:
+                fh.write(line + "\n")
+    except Exception as exc:
+        print("[kb-advisor] could not write log %s: %s" % (path, exc), flush=True)
+
+
+# ---------------------------------------------------------------------------
+# Em-dash backstop (production invariant: prompts alone don't hold).
+# ---------------------------------------------------------------------------
+_EM_DASH_RE = re.compile(r"\s*[—–]\s*")
+
+
+def _strip_em_dashes(text):
+    return _EM_DASH_RE.sub(", ", text)
+
+
+# ---------------------------------------------------------------------------
+# Location hooks (optional; the example client implements US-state routing)
+# ---------------------------------------------------------------------------
+def _is_state_resource(source):
+    if HOOKS and hasattr(HOOKS, "is_local_resource"):
+        return bool(HOOKS.is_local_resource(source))
+    return False
+
+
+def wants_local(question, mentioned_now):
+    if not (HOOKS and hasattr(HOOKS, "folder_prefix")):
+        return False
+    if mentioned_now:
+        return True
+    probe = retrieval.retrieve_context(question, BM25, CHUNKS, k=LOC_PROBE_K)
+    return any(_is_state_resource(h["source"]) for h in probe)
+
+
+@functools.lru_cache(maxsize=64)
+def _folder_indices(prefix):
+    return tuple(i for i, c in enumerate(CHUNKS) if c["source"].startswith(prefix))
+
+
+def location_hits(question, folder, k=LOC_K):
+    idx = _folder_indices(folder)
+    if not idx:
+        return []
+    qtok = retrieval.tokenize(question)
+    scores = BM25.get_scores(qtok) if qtok else None
+    order = sorted(idx, key=lambda i: -scores[i]) if scores is not None else list(idx)
+    out = []
+    for i in order[:k]:
+        c = CHUNKS[i]
+        out.append({"text": c["text"], "source": c["source"], "title": c["title"]})
+    return out
+
+
+def location_note(loc, local, ask_where=False):
+    if HOOKS and hasattr(HOOKS, "location_note"):
+        return HOOKS.location_note(loc, local, ask_where)
+    return ""
+
+
+# ---------------------------------------------------------------------------
+# Context gathering: crisis inject first, then location routing, then BM25.
+# ---------------------------------------------------------------------------
+def gather_context(question, loc=None, mentioned_now=False):
+    crisis = is_crisis(question)
+    hits = retrieval.retrieve_context(question, BM25, CHUNKS, k=TOP_K + LOC_K)
+    state = None
+    local = wants_local(question, mentioned_now)
+    if HOOKS and loc and hasattr(HOOKS, "same_state_folder"):
+        state = loc.get("state") if not loc.get("ambiguous") else None
+    ask_where = local and not state and not (loc and loc.get("ambiguous"))
+    local = local and bool(state)
+    if not state:
+        hits = [h for h in hits if not _is_state_resource(h["source"])]
+    if state and HOOKS:
+        hits = [h for h in hits if HOOKS.same_state_folder(h["source"], state)]
+        if local:
+            first = location_hits(question, HOOKS.folder_prefix(state))
+            seen = {h["source"] + h["text"][:80] for h in first}
+            hits = first + [h for h in hits if h["source"] + h["text"][:80] not in seen]
+    hits = hits[:TOP_K + (LOC_K if local else 0)]
+
+    if crisis:
+        injected = _crisis_chunks()
+        if injected:
+            # Prepend so safety text is FIRST in context; keep up to TOP_K
+            # normal hits (deduped) so a research question that happens to
+            # contain crisis wording still gets its real answer.
+            injected_sources = {c["source"] for c in injected}
+            hits = injected + [h for h in hits if h["source"] not in injected_sources][:TOP_K]
+        _append_jsonl(CRISIS_LOG, {"ts": time.time(), "question": question,
+                                   "injected_chunks": len(injected)})
+    return hits, crisis, local, ask_where
+
+
+def answer_question(question, loc=None, mentioned_now=False):
+    t0 = time.perf_counter()
+    hits, crisis, local, ask_where = gather_context(question, loc, mentioned_now)
+    t1 = time.perf_counter()
+    if not hits:
+        return "", []
+
+    context = "\n\n".join("Source: %s\n%s" % (h["source"], h["text"]) for h in hits)
+    system = SYSTEM_PROMPT if not crisis else (
+        SYSTEM_PROMPT + "\n\n" + CRISIS_CFG["system_addendum"])
+    messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": "Context:\n%s\n\n%sQuestion: %s"
+                                    % (context, location_note(loc, local, ask_where), question)},
+    ]
+    result = llm_router.generate_with_fallback(messages)
+    t2 = time.perf_counter()
+    print("[kb-advisor] timing: retrieval=%.3fs generation=%.3fs "
+          "(tier=%s, finish_reason=%s, crisis=%s)"
+          % (t1 - t0, t2 - t1, result.get("served_by"), result.get("finish_reason"), crisis),
+          flush=True)
+    sources = [h["source"] for h in hits]
+    if result["error"]:
+        print("[kb-advisor] generation failed: %s" % result["error"], flush=True)
+        return "", sources
+    return _strip_em_dashes(result["text"]), sources
+
+
+class Handler(BaseHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
+
+    def _send(self, code, payload, close=False):
+        body = json.dumps(payload).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        if close:
+            self.send_header("Connection", "close")
+        self.end_headers()
+        try:
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
+    def log_message(self, *args):
+        pass
+
+    def do_GET(self):
+        if self.path == "/health":
+            self._send(200, {"ok": True, "chunks": len(CHUNKS)})
+        elif self.path == "/health/deep":
+            self._handle_deep_health()
+        else:
+            self._send(404, {"error": "not found"})
+
+    def _handle_deep_health(self):
+        """Runs a real generation to verify the full pipeline: retrieval + LLM."""
+        t0 = time.perf_counter()
+        try:
+            answer, sources = answer_question(DEEP_HEALTH_QUESTION)
+        except Exception as exc:
+            self._send(502, {"ok": False, "error": str(exc), "ms": round(1000 * (time.perf_counter() - t0))})
+            return
+        elapsed_ms = round(1000 * (time.perf_counter() - t0))
+        ok = bool(answer)
+        self._send(200 if ok else 502, {
+            "ok": ok,
+            "chunks": len(CHUNKS),
+            "generation_ok": ok,
+            "ms": elapsed_ms,
+            "sources": len(sources) if sources else 0,
+        })
+
+    def _read_json(self, max_len=10000):
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+        except ValueError:
+            length = 0
+        if length <= 0 or length > max_len:
+            self._send(400, {"error": "bad request"}, close=True)
+            return None
+        try:
+            return json.loads(self.rfile.read(length).decode("utf-8"))
+        except Exception:
+            self._send(400, {"error": "invalid json"})
+            return None
+
+    def _authorized(self):
+        return not TOKEN or self.headers.get("Authorization", "") == "Bearer " + TOKEN
+
+    def do_POST(self):
+        if self.path == "/chat":
+            return self._handle_chat()
+        if self.path == "/feedback":
+            return self._handle_feedback()
+        return self._send(404, {"error": "not found"}, close=True)
+
+    def _handle_chat(self):
+        # Unauthorized reply must close BEFORE reading the body: Caddy pools
+        # backend connections and an unread body poisons the next request.
+        if not self._authorized():
+            return self._send(401, {"error": "unauthorized"}, close=True)
+
+        data = self._read_json()
+        if data is None:
+            return
+        question = str(data.get("question", "")).strip()
+        if not question:
+            return self._send(400, {"error": "empty question"})
+        question = question[:MAX_Q]
+
+        loc = None
+        mentioned_now = False
+        if HOOKS and hasattr(HOOKS, "detect_location"):
+            found_now = HOOKS.detect_location(question)
+            loc = HOOKS.resolve_location(question, data.get("location")) \
+                if hasattr(HOOKS, "resolve_location") else found_now
+            mentioned_now = bool(found_now)
+
+        try:
+            answer, sources = answer_question(question, loc, mentioned_now)
+        except Exception as exc:
+            print("[kb-advisor] error:", exc, flush=True)
+            return self._send(502, {"error": "The advisor hit an error answering that."})
+
+        if not answer:
+            return self._send(502, {"error": "The advisor could not answer that from the knowledge base."})
+
+        qid = uuid.uuid4().hex[:12]
+        sources = [str(s) for s in (sources or [])]
+        cit = citations.build_citations_grounded(VAULT_ROOT, sources, answer, MAX_CITATIONS)
+        _append_jsonl(QA_LOG, {
+            "id": qid,
+            "ts": time.time(),
+            "question": question,
+            "answer": answer,
+            "sources": sources,
+            "citations": cit,
+        })
+        return self._send(200, {
+            "id": qid,
+            "answer": answer,
+            "sources": sources,
+            "citations": cit,
+            "location": None,
+            "location_ambiguous": None,
+        })
+
+    def _handle_feedback(self):
+        if not self._authorized():
+            return self._send(401, {"error": "unauthorized"}, close=True)
+
+        data = self._read_json(max_len=4000)
+        if data is None:
+            return
+        qid = str(data.get("id", "")).strip()[:32]
+        vote = str(data.get("vote", "")).strip().lower()
+        note = str(data.get("note", "")).strip()[:MAX_NOTE]
+        if vote not in ("up", "down"):
+            return self._send(400, {"error": "vote must be 'up' or 'down'"})
+
+        _append_jsonl(FEEDBACK_LOG, {
+            "id": qid,
+            "ts": time.time(),
+            "vote": vote,
+            "note": note,
+        })
+        return self._send(200, {"ok": True})
+
+
+def main():
+    # Warm the tier-2 mention catalog now, not on the first request.
+    _t0 = time.perf_counter()
+    citations._vault_catalog(VAULT_ROOT)
+    print("Vault mention catalog ready (%.1fs)."
+          % (time.perf_counter() - _t0), flush=True)
+    server = ThreadingHTTPServer((HOST, PORT), Handler)
+    print("kb-advisor listening on http://%s:%d  (POST /chat, POST /feedback)"
+          % (HOST, PORT), flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+
+
+if __name__ == "__main__":
+    main()

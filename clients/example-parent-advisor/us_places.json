@@ -1,0 +1,3155 @@
+{
+"places": {
+"Abilene": [
+"Texas"
+],
+"Abington": [
+"Pennsylvania"
+],
+"Akron": [
+"Ohio"
+],
+"Alameda": [
+"California"
+],
+"Albany": [
+"Georgia",
+"New York",
+"Oregon"
+],
+"Albuquerque": [
+"New Mexico"
+],
+"Alexandria": [
+"Louisiana",
+"Virginia"
+],
+"Alhambra": [
+"California"
+],
+"Aliso Viejo": [
+"California"
+],
+"Allen": [
+"Texas"
+],
+"Allentown": [
+"Pennsylvania"
+],
+"Alpharetta": [
+"Georgia"
+],
+"Altamonte Springs": [
+"Florida"
+],
+"Altoona": [
+"Pennsylvania"
+],
+"Amarillo": [
+"Texas"
+],
+"Ames": [
+"Iowa"
+],
+"Amherst": [
+"New York"
+],
+"Amherst Town": [
+"Massachusetts"
+],
+"Anaheim": [
+"California"
+],
+"Anchorage": [
+"Alaska"
+],
+"Anderson": [
+"Indiana"
+],
+"Ankeny": [
+"Iowa"
+],
+"Ann Arbor": [
+"Michigan"
+],
+"Annapolis": [
+"Maryland"
+],
+"Antioch": [
+"California"
+],
+"Apache Junction": [
+"Arizona"
+],
+"Apex": [
+"North Carolina"
+],
+"Apopka": [
+"Florida"
+],
+"Apple Valley": [
+"California",
+"Minnesota"
+],
+"Appleton": [
+"Wisconsin"
+],
+"Arcadia": [
+"California"
+],
+"Arlington": [
+"Massachusetts",
+"Texas",
+"Virginia"
+],
+"Arlington Heights": [
+"Illinois"
+],
+"Arvada": [
+"Colorado"
+],
+"Asheville": [
+"North Carolina"
+],
+"Athens": [
+"Georgia"
+],
+"Atlanta": [
+"Georgia"
+],
+"Attleboro": [
+"Massachusetts"
+],
+"Auburn": [
+"Alabama",
+"Washington"
+],
+"Augusta": [
+"Georgia"
+],
+"Aurora": [
+"Colorado",
+"Illinois"
+],
+"Austin": [
+"Texas"
+],
+"Avondale": [
+"Arizona"
+],
+"Azusa": [
+"California"
+],
+"Babylon": [
+"New York"
+],
+"Bakersfield": [
+"California"
+],
+"Baldwin Park": [
+"California"
+],
+"Baltimore": [
+"Maryland"
+],
+"Barnstable Town": [
+"Massachusetts"
+],
+"Bartlett": [
+"Tennessee"
+],
+"Baton Rouge": [
+"Louisiana"
+],
+"Battle Creek": [
+"Michigan"
+],
+"Bayonne": [
+"New Jersey"
+],
+"Baytown": [
+"Texas"
+],
+"Beaumont": [
+"California",
+"Texas"
+],
+"Beavercreek": [
+"Ohio"
+],
+"Beaverton": [
+"Oregon"
+],
+"Bedford": [
+"Texas"
+],
+"Belleville": [
+"Illinois"
+],
+"Bellevue": [
+"Nebraska",
+"Washington"
+],
+"Bellflower": [
+"California"
+],
+"Bellingham": [
+"Washington"
+],
+"Bend": [
+"Oregon"
+],
+"Bensalem": [
+"Pennsylvania"
+],
+"Bentonville": [
+"Arkansas"
+],
+"Berkeley": [
+"California",
+"New Jersey"
+],
+"Berwyn": [
+"Illinois"
+],
+"Bethesda": [
+"Maryland"
+],
+"Bethlehem": [
+"Pennsylvania"
+],
+"Beverly": [
+"Massachusetts"
+],
+"Billerica": [
+"Massachusetts"
+],
+"Billings": [
+"Montana"
+],
+"Biloxi": [
+"Mississippi"
+],
+"Binghamton": [
+"New York"
+],
+"Birmingham": [
+"Alabama"
+],
+"Bismarck": [
+"North Dakota"
+],
+"Blacksburg": [
+"Virginia"
+],
+"Blaine": [
+"Minnesota"
+],
+"Bloomfield": [
+"New Jersey"
+],
+"Bloomington": [
+"Illinois",
+"Indiana",
+"Minnesota"
+],
+"Blue Springs": [
+"Missouri"
+],
+"Boca Raton": [
+"Florida"
+],
+"Boise City": [
+"Idaho"
+],
+"Bolingbrook": [
+"Illinois"
+],
+"Bonita Springs": [
+"Florida"
+],
+"Bossier City": [
+"Louisiana"
+],
+"Boston": [
+"Massachusetts"
+],
+"Bothell": [
+"Washington"
+],
+"Boulder": [
+"Colorado"
+],
+"Bountiful": [
+"Utah"
+],
+"Bowie": [
+"Maryland"
+],
+"Bowling Green": [
+"Kentucky"
+],
+"Boynton Beach": [
+"Florida"
+],
+"Bozeman": [
+"Montana"
+],
+"Bradenton": [
+"Florida"
+],
+"Brandon": [
+"Florida"
+],
+"Brea": [
+"California"
+],
+"Bremerton": [
+"Washington"
+],
+"Brentwood": [
+"California",
+"Tennessee"
+],
+"Brick": [
+"New Jersey"
+],
+"Bridgeport": [
+"Connecticut"
+],
+"Bridgewater": [
+"New Jersey"
+],
+"Brighton": [
+"Colorado"
+],
+"Bristol": [
+"Connecticut",
+"Pennsylvania"
+],
+"Brockton": [
+"Massachusetts"
+],
+"Broken Arrow": [
+"Oklahoma"
+],
+"Brookfield": [
+"Wisconsin"
+],
+"Brookhaven": [
+"Georgia",
+"New York"
+],
+"Brookline": [
+"Massachusetts"
+],
+"Brooklyn Park": [
+"Minnesota"
+],
+"Broomfield": [
+"Colorado"
+],
+"Brownsville": [
+"Texas"
+],
+"Bryan": [
+"Texas"
+],
+"Buckeye": [
+"Arizona"
+],
+"Buena Park": [
+"California"
+],
+"Buffalo": [
+"New York"
+],
+"Buffalo Grove": [
+"Illinois"
+],
+"Bullhead City": [
+"Arizona"
+],
+"Burbank": [
+"California"
+],
+"Burien": [
+"Washington"
+],
+"Burleson": [
+"Texas"
+],
+"Burlington": [
+"North Carolina",
+"Vermont"
+],
+"Burnsville": [
+"Minnesota"
+],
+"Caldwell": [
+"Idaho"
+],
+"Camarillo": [
+"California"
+],
+"Cambridge": [
+"Massachusetts"
+],
+"Camden": [
+"New Jersey"
+],
+"Campbell": [
+"California"
+],
+"Canton": [
+"Ohio"
+],
+"Cape Coral": [
+"Florida"
+],
+"Cape Girardeau": [
+"Missouri"
+],
+"Carlsbad": [
+"California"
+],
+"Carmel": [
+"Indiana"
+],
+"Carrollton": [
+"Texas"
+],
+"Carson": [
+"California"
+],
+"Carson City": [
+"Nevada"
+],
+"Cary": [
+"North Carolina"
+],
+"Casa Grande": [
+"Arizona"
+],
+"Casper": [
+"Wyoming"
+],
+"Castle Rock": [
+"Colorado"
+],
+"Cathedral City": [
+"California"
+],
+"Cedar Falls": [
+"Iowa"
+],
+"Cedar Hill": [
+"Texas"
+],
+"Cedar Park": [
+"Texas"
+],
+"Cedar Rapids": [
+"Iowa"
+],
+"Celina": [
+"Texas"
+],
+"Centennial": [
+"Colorado"
+],
+"Ceres": [
+"California"
+],
+"Cerritos": [
+"California"
+],
+"Champaign": [
+"Illinois"
+],
+"Chandler": [
+"Arizona"
+],
+"Chapel Hill": [
+"North Carolina"
+],
+"Charleston": [
+"South Carolina",
+"West Virginia"
+],
+"Charlotte": [
+"North Carolina"
+],
+"Charlottesville": [
+"Virginia"
+],
+"Chattanooga": [
+"Tennessee"
+],
+"Cheektowaga": [
+"New York"
+],
+"Cherry Hill": [
+"New Jersey"
+],
+"Chesapeake": [
+"Virginia"
+],
+"Chesterfield": [
+"Missouri"
+],
+"Cheyenne": [
+"Wyoming"
+],
+"Chicago": [
+"Illinois"
+],
+"Chico": [
+"California"
+],
+"Chicopee": [
+"Massachusetts"
+],
+"Chino": [
+"California"
+],
+"Chino Hills": [
+"California"
+],
+"Chula Vista": [
+"California"
+],
+"Cicero": [
+"Illinois"
+],
+"Cincinnati": [
+"Ohio"
+],
+"Citrus Heights": [
+"California"
+],
+"Clarkstown": [
+"New York"
+],
+"Clarksville": [
+"Tennessee"
+],
+"Clay": [
+"New York"
+],
+"Clearwater": [
+"Florida"
+],
+"Clermont": [
+"Florida"
+],
+"Cleveland": [
+"Ohio",
+"Tennessee"
+],
+"Cleveland Heights": [
+"Ohio"
+],
+"Clifton": [
+"New Jersey"
+],
+"Clovis": [
+"California"
+],
+"Coachella": [
+"California"
+],
+"Coconut Creek": [
+"Florida"
+],
+"Coeur d'Alene": [
+"Idaho"
+],
+"College Station": [
+"Texas"
+],
+"Collierville": [
+"Tennessee"
+],
+"Colonie": [
+"New York"
+],
+"Colorado Springs": [
+"Colorado"
+],
+"Colton": [
+"California"
+],
+"Columbia": [
+"Maryland",
+"Missouri",
+"South Carolina",
+"Tennessee"
+],
+"Columbus": [
+"Georgia",
+"Indiana",
+"Ohio"
+],
+"Commerce City": [
+"Colorado"
+],
+"Compton": [
+"California"
+],
+"Concord": [
+"California",
+"New Hampshire",
+"North Carolina"
+],
+"Conroe": [
+"Texas"
+],
+"Conway": [
+"Arkansas"
+],
+"Coon Rapids": [
+"Minnesota"
+],
+"Coppell": [
+"Texas"
+],
+"Coral Gables": [
+"Florida"
+],
+"Coral Springs": [
+"Florida"
+],
+"Corona": [
+"California"
+],
+"Corpus Christi": [
+"Texas"
+],
+"Cortlandt": [
+"New York"
+],
+"Corvallis": [
+"Oregon"
+],
+"Costa Mesa": [
+"California"
+],
+"Cottage Grove": [
+"Minnesota"
+],
+"Council Bluffs": [
+"Iowa"
+],
+"Covina": [
+"California"
+],
+"Covington": [
+"Kentucky"
+],
+"Cranston": [
+"Rhode Island"
+],
+"Crystal Lake": [
+"Illinois"
+],
+"Cupertino": [
+"California"
+],
+"Cutler Bay": [
+"Florida"
+],
+"Cuyahoga Falls": [
+"Ohio"
+],
+"Cypress": [
+"California"
+],
+"Dallas": [
+"Texas"
+],
+"Daly City": [
+"California"
+],
+"Danbury": [
+"Connecticut"
+],
+"Danville": [
+"California",
+"Virginia"
+],
+"Davenport": [
+"Iowa"
+],
+"Davie": [
+"Florida"
+],
+"Davis": [
+"California"
+],
+"Dayton": [
+"Ohio"
+],
+"Daytona Beach": [
+"Florida"
+],
+"DeKalb": [
+"Illinois"
+],
+"DeLand": [
+"Florida"
+],
+"DeSoto": [
+"Texas"
+],
+"Dearborn": [
+"Michigan"
+],
+"Dearborn Heights": [
+"Michigan"
+],
+"Decatur": [
+"Alabama",
+"Illinois"
+],
+"Deerfield Beach": [
+"Florida"
+],
+"Delano": [
+"California"
+],
+"Delaware": [
+"Ohio"
+],
+"Delray Beach": [
+"Florida"
+],
+"Deltona": [
+"Florida"
+],
+"Denton": [
+"Texas"
+],
+"Denver": [
+"Colorado"
+],
+"Des Moines": [
+"Iowa"
+],
+"Des Plaines": [
+"Illinois"
+],
+"Detroit": [
+"Michigan"
+],
+"Diamond Bar": [
+"California"
+],
+"Doral": [
+"Florida"
+],
+"Dothan": [
+"Alabama"
+],
+"Downers Grove": [
+"Illinois"
+],
+"Downey": [
+"California"
+],
+"Draper": [
+"Utah"
+],
+"Dublin": [
+"California",
+"Ohio"
+],
+"Dubuque": [
+"Iowa"
+],
+"Duluth": [
+"Minnesota"
+],
+"Dunwoody": [
+"Georgia"
+],
+"Durham": [
+"North Carolina"
+],
+"Eagan": [
+"Minnesota"
+],
+"Eagle Mountain": [
+"Utah"
+],
+"East Brunswick": [
+"New Jersey"
+],
+"East Hartford": [
+"Connecticut"
+],
+"East Lansing": [
+"Michigan"
+],
+"East Los Angeles": [
+"California"
+],
+"East Orange": [
+"New Jersey"
+],
+"East Providence": [
+"Rhode Island"
+],
+"Eastvale": [
+"California"
+],
+"Eau Claire": [
+"Wisconsin"
+],
+"Eden Prairie": [
+"Minnesota"
+],
+"Edina": [
+"Minnesota"
+],
+"Edinburg": [
+"Texas"
+],
+"Edison": [
+"New Jersey"
+],
+"Edmond": [
+"Oklahoma"
+],
+"Edmonds": [
+"Washington"
+],
+"Egg Harbor": [
+"New Jersey"
+],
+"El Cajon": [
+"California"
+],
+"El Centro": [
+"California"
+],
+"El Monte": [
+"California"
+],
+"El Paso": [
+"Texas"
+],
+"Elgin": [
+"Illinois"
+],
+"Elizabeth": [
+"New Jersey"
+],
+"Elk Grove": [
+"California"
+],
+"Elkhart": [
+"Indiana"
+],
+"Ellicott City": [
+"Maryland"
+],
+"Elmhurst": [
+"Illinois"
+],
+"Elyria": [
+"Ohio"
+],
+"Encinitas": [
+"California"
+],
+"Enfield": [
+"Connecticut"
+],
+"Enid": [
+"Oklahoma"
+],
+"Erie": [
+"Pennsylvania"
+],
+"Escondido": [
+"California"
+],
+"Euclid": [
+"Ohio"
+],
+"Eugene": [
+"Oregon"
+],
+"Euless": [
+"Texas"
+],
+"Evanston": [
+"Illinois"
+],
+"Evansville": [
+"Indiana"
+],
+"Everett": [
+"Massachusetts",
+"Washington"
+],
+"Evesham": [
+"New Jersey"
+],
+"Fairfield": [
+"California",
+"Connecticut",
+"Ohio"
+],
+"Fall River": [
+"Massachusetts"
+],
+"Fargo": [
+"North Dakota"
+],
+"Farmington": [
+"New Mexico"
+],
+"Farmington Hills": [
+"Michigan"
+],
+"Fayetteville": [
+"Arkansas",
+"North Carolina"
+],
+"Federal Way": [
+"Washington"
+],
+"Findlay": [
+"Ohio"
+],
+"Fishers": [
+"Indiana"
+],
+"Fitchburg": [
+"Massachusetts"
+],
+"Flagstaff": [
+"Arizona"
+],
+"Flint": [
+"Michigan"
+],
+"Florence": [
+"Alabama",
+"South Carolina"
+],
+"Florissant": [
+"Missouri"
+],
+"Flower Mound": [
+"Texas"
+],
+"Folsom": [
+"California"
+],
+"Fond du Lac": [
+"Wisconsin"
+],
+"Fontana": [
+"California"
+],
+"Fort Collins": [
+"Colorado"
+],
+"Fort Lauderdale": [
+"Florida"
+],
+"Fort Myers": [
+"Florida"
+],
+"Fort Pierce": [
+"Florida"
+],
+"Fort Smith": [
+"Arkansas"
+],
+"Fort Wayne": [
+"Indiana"
+],
+"Fort Worth": [
+"Texas"
+],
+"Fountain Valley": [
+"California"
+],
+"Framingham": [
+"Massachusetts"
+],
+"Franklin": [
+"New Jersey",
+"Tennessee"
+],
+"Frederick": [
+"Maryland"
+],
+"Freeport": [
+"New York"
+],
+"Fremont": [
+"California"
+],
+"Fresno": [
+"California"
+],
+"Friendswood": [
+"Texas"
+],
+"Frisco": [
+"Texas"
+],
+"Fullerton": [
+"California"
+],
+"Fulshear": [
+"Texas"
+],
+"Fuquay-Varina": [
+"North Carolina"
+],
+"Gainesville": [
+"Florida",
+"Georgia"
+],
+"Gaithersburg": [
+"Maryland"
+],
+"Gallatin": [
+"Tennessee"
+],
+"Galveston": [
+"Texas"
+],
+"Garden Grove": [
+"California"
+],
+"Gardena": [
+"California"
+],
+"Garland": [
+"Texas"
+],
+"Gary": [
+"Indiana"
+],
+"Gastonia": [
+"North Carolina"
+],
+"Georgetown": [
+"Texas"
+],
+"Germantown": [
+"Maryland",
+"Tennessee"
+],
+"Gilbert": [
+"Arizona"
+],
+"Gilroy": [
+"California"
+],
+"Glen Burnie": [
+"Maryland"
+],
+"Glendale": [
+"Arizona",
+"California"
+],
+"Glendora": [
+"California"
+],
+"Glenview": [
+"Illinois"
+],
+"Gloucester": [
+"New Jersey"
+],
+"Goodyear": [
+"Arizona"
+],
+"Goose Creek": [
+"South Carolina"
+],
+"Grand Forks": [
+"North Dakota"
+],
+"Grand Island": [
+"Nebraska"
+],
+"Grand Junction": [
+"Colorado"
+],
+"Grand Prairie": [
+"Texas"
+],
+"Grand Rapids": [
+"Michigan"
+],
+"Grapevine": [
+"Texas"
+],
+"Great Falls": [
+"Montana"
+],
+"Greece": [
+"New York"
+],
+"Greeley": [
+"Colorado"
+],
+"Green Bay": [
+"Wisconsin"
+],
+"Greenacres": [
+"Florida"
+],
+"Greenburgh": [
+"New York"
+],
+"Greensboro": [
+"North Carolina"
+],
+"Greenville": [
+"North Carolina",
+"South Carolina"
+],
+"Greenwich": [
+"Connecticut"
+],
+"Greenwood": [
+"Indiana"
+],
+"Greer": [
+"South Carolina"
+],
+"Gresham": [
+"Oregon"
+],
+"Grove City": [
+"Ohio"
+],
+"Gulfport": [
+"Mississippi"
+],
+"Hackensack": [
+"New Jersey"
+],
+"Hagerstown": [
+"Maryland"
+],
+"Hallandale Beach": [
+"Florida"
+],
+"Haltom City": [
+"Texas"
+],
+"Hamburg": [
+"New York"
+],
+"Hamden": [
+"Connecticut"
+],
+"Hamilton": [
+"New Jersey",
+"Ohio"
+],
+"Hammond": [
+"Indiana"
+],
+"Hampton": [
+"Virginia"
+],
+"Hanford": [
+"California"
+],
+"Harlingen": [
+"Texas"
+],
+"Harrisburg": [
+"Pennsylvania"
+],
+"Harrisonburg": [
+"Virginia"
+],
+"Hartford": [
+"Connecticut"
+],
+"Hattiesburg": [
+"Mississippi"
+],
+"Haverford": [
+"Pennsylvania"
+],
+"Haverhill": [
+"Massachusetts"
+],
+"Hawthorne": [
+"California"
+],
+"Hayward": [
+"California"
+],
+"Hemet": [
+"California"
+],
+"Hempfield": [
+"Pennsylvania"
+],
+"Hempstead": [
+"New York"
+],
+"Henderson": [
+"Nevada"
+],
+"Hendersonville": [
+"Tennessee"
+],
+"Henrietta": [
+"New York"
+],
+"Herriman": [
+"Utah"
+],
+"Hesperia": [
+"California"
+],
+"Hialeah": [
+"Florida"
+],
+"Hickory": [
+"North Carolina"
+],
+"High Point": [
+"North Carolina"
+],
+"Highland": [
+"California"
+],
+"Highlands Ranch": [
+"Colorado"
+],
+"Hillsboro": [
+"Oregon"
+],
+"Hillsborough": [
+"New Jersey"
+],
+"Hoboken": [
+"New Jersey"
+],
+"Hoffman Estates": [
+"Illinois"
+],
+"Hollister": [
+"California"
+],
+"Holly Springs": [
+"North Carolina"
+],
+"Hollywood": [
+"Florida"
+],
+"Homestead": [
+"Florida"
+],
+"Honolulu": [
+"Hawaii"
+],
+"Hoover": [
+"Alabama"
+],
+"Houston": [
+"Texas"
+],
+"Howell": [
+"New Jersey"
+],
+"Huber Heights": [
+"Ohio"
+],
+"Huntersville": [
+"North Carolina"
+],
+"Huntington": [
+"New York",
+"West Virginia"
+],
+"Huntington Beach": [
+"California"
+],
+"Huntington Park": [
+"California"
+],
+"Huntsville": [
+"Alabama",
+"Texas"
+],
+"Hyattsville": [
+"Maryland"
+],
+"Idaho Falls": [
+"Idaho"
+],
+"Independence": [
+"Missouri"
+],
+"Indian Trail": [
+"North Carolina"
+],
+"Indianapolis": [
+"Indiana"
+],
+"Indio": [
+"California"
+],
+"Inglewood": [
+"California"
+],
+"Iowa City": [
+"Iowa"
+],
+"Irondequoit": [
+"New York"
+],
+"Irvine": [
+"California"
+],
+"Irving": [
+"Texas"
+],
+"Irvington": [
+"New Jersey"
+],
+"Islip": [
+"New York"
+],
+"Jackson": [
+"Mississippi",
+"New Jersey",
+"Tennessee"
+],
+"Jacksonville": [
+"Florida",
+"North Carolina"
+],
+"Janesville": [
+"Wisconsin"
+],
+"Jefferson City": [
+"Missouri"
+],
+"Jeffersonville": [
+"Indiana"
+],
+"Jersey City": [
+"New Jersey"
+],
+"Johns Creek": [
+"Georgia"
+],
+"Johnson City": [
+"Tennessee"
+],
+"Joliet": [
+"Illinois"
+],
+"Jonesboro": [
+"Arkansas"
+],
+"Joplin": [
+"Missouri"
+],
+"Jupiter": [
+"Florida"
+],
+"Jurupa Valley": [
+"California"
+],
+"Kalamazoo": [
+"Michigan"
+],
+"Kannapolis": [
+"North Carolina"
+],
+"Kansas City": [
+"Kansas",
+"Missouri"
+],
+"Keller": [
+"Texas"
+],
+"Kenner": [
+"Louisiana"
+],
+"Kennewick": [
+"Washington"
+],
+"Kenosha": [
+"Wisconsin"
+],
+"Kent": [
+"Washington"
+],
+"Kentwood": [
+"Michigan"
+],
+"Kettering": [
+"Ohio"
+],
+"Killeen": [
+"Texas"
+],
+"Kingsport": [
+"Tennessee"
+],
+"Kirkland": [
+"Washington"
+],
+"Kiryas Joel": [
+"New York"
+],
+"Kissimmee": [
+"Florida"
+],
+"Knoxville": [
+"Tennessee"
+],
+"Kokomo": [
+"Indiana"
+],
+"Kyle": [
+"Texas"
+],
+"La Crosse": [
+"Wisconsin"
+],
+"La Habra": [
+"California"
+],
+"La Mesa": [
+"California"
+],
+"La Mirada": [
+"California"
+],
+"Lacey": [
+"Washington"
+],
+"Lafayette": [
+"Indiana",
+"Louisiana"
+],
+"Laguna Niguel": [
+"California"
+],
+"Lake Charles": [
+"Louisiana"
+],
+"Lake Elsinore": [
+"California"
+],
+"Lake Forest": [
+"California"
+],
+"Lake Havasu City": [
+"Arizona"
+],
+"Lake Stevens": [
+"Washington"
+],
+"Lake Worth Beach": [
+"Florida"
+],
+"Lakeland": [
+"Florida"
+],
+"Lakeville": [
+"Minnesota"
+],
+"Lakewood": [
+"California",
+"Colorado",
+"New Jersey",
+"Ohio",
+"Washington"
+],
+"Lancaster": [
+"California",
+"New York",
+"Ohio",
+"Pennsylvania",
+"Texas"
+],
+"Landover": [
+"Maryland"
+],
+"Lansing": [
+"Michigan"
+],
+"Laredo": [
+"Texas"
+],
+"Largo": [
+"Florida",
+"Maryland"
+],
+"Las Cruces": [
+"New Mexico"
+],
+"Las Vegas": [
+"Nevada"
+],
+"Lauderhill": [
+"Florida"
+],
+"Laurel": [
+"Maryland"
+],
+"Lawrence": [
+"Indiana",
+"Kansas",
+"Massachusetts"
+],
+"Lawton": [
+"Oklahoma"
+],
+"Layton": [
+"Utah"
+],
+"League City": [
+"Texas"
+],
+"Leander": [
+"Texas"
+],
+"Lebanon": [
+"Tennessee"
+],
+"Lee's Summit": [
+"Missouri"
+],
+"Leesburg": [
+"Virginia"
+],
+"Lehi": [
+"Utah"
+],
+"Lenexa": [
+"Kansas"
+],
+"Leominster": [
+"Massachusetts"
+],
+"Levittown": [
+"New York",
+"Pennsylvania"
+],
+"Lewisville": [
+"Texas"
+],
+"Lexington": [
+"Kentucky"
+],
+"Lincoln": [
+"California",
+"Nebraska"
+],
+"Linden": [
+"New Jersey"
+],
+"Little Elm": [
+"Texas"
+],
+"Little Rock": [
+"Arkansas"
+],
+"Littleton": [
+"Colorado"
+],
+"Livermore": [
+"California"
+],
+"Livonia": [
+"Michigan"
+],
+"Lodi": [
+"California"
+],
+"Logan": [
+"Utah"
+],
+"Lombard": [
+"Illinois"
+],
+"Lompoc": [
+"California"
+],
+"Long Beach": [
+"California"
+],
+"Longmont": [
+"Colorado"
+],
+"Longview": [
+"Texas"
+],
+"Lorain": [
+"Ohio"
+],
+"Los Angeles": [
+"California"
+],
+"Los Banos": [
+"California"
+],
+"Louisville": [
+"Kentucky"
+],
+"Loveland": [
+"Colorado"
+],
+"Lowell": [
+"Massachusetts"
+],
+"Lower Merion": [
+"Pennsylvania"
+],
+"Lower Paxton": [
+"Pennsylvania"
+],
+"Lubbock": [
+"Texas"
+],
+"Lynchburg": [
+"Virginia"
+],
+"Lynn": [
+"Massachusetts"
+],
+"Lynnwood": [
+"Washington"
+],
+"Lynwood": [
+"California"
+],
+"Macon": [
+"Georgia"
+],
+"Madera": [
+"California"
+],
+"Madison": [
+"Alabama",
+"Wisconsin"
+],
+"Malden": [
+"Massachusetts"
+],
+"Manalapan": [
+"New Jersey"
+],
+"Manassas": [
+"Virginia"
+],
+"Manchester": [
+"Connecticut",
+"New Hampshire",
+"New Jersey"
+],
+"Manhattan": [
+"Kansas"
+],
+"Manheim": [
+"Pennsylvania"
+],
+"Mankato": [
+"Minnesota"
+],
+"Mansfield": [
+"Ohio",
+"Texas"
+],
+"Manteca": [
+"California"
+],
+"Maple Grove": [
+"Minnesota"
+],
+"Marana": [
+"Arizona"
+],
+"Margate": [
+"Florida"
+],
+"Maricopa": [
+"Arizona"
+],
+"Marietta": [
+"Georgia"
+],
+"Marion": [
+"Iowa"
+],
+"Marlboro": [
+"New Jersey"
+],
+"Marlborough": [
+"Massachusetts"
+],
+"Marysville": [
+"Washington"
+],
+"McAllen": [
+"Texas"
+],
+"McKinney": [
+"Texas"
+],
+"Medford": [
+"Massachusetts",
+"Oregon"
+],
+"Melbourne": [
+"Florida"
+],
+"Memphis": [
+"Tennessee"
+],
+"Menifee": [
+"California"
+],
+"Mentor": [
+"Ohio"
+],
+"Merced": [
+"California"
+],
+"Meriden": [
+"Connecticut"
+],
+"Meridian": [
+"Idaho"
+],
+"Mesa": [
+"Arizona"
+],
+"Mesquite": [
+"Texas"
+],
+"Metairie": [
+"Louisiana"
+],
+"Methuen Town": [
+"Massachusetts"
+],
+"Miami": [
+"Florida"
+],
+"Miami Beach": [
+"Florida"
+],
+"Miami Gardens": [
+"Florida"
+],
+"Middletown": [
+"Connecticut",
+"New Jersey",
+"Ohio",
+"Pennsylvania"
+],
+"Midland": [
+"Michigan",
+"Texas"
+],
+"Midlothian": [
+"Texas"
+],
+"Midwest City": [
+"Oklahoma"
+],
+"Milford": [
+"Connecticut"
+],
+"Millcreek": [
+"Pennsylvania",
+"Utah"
+],
+"Milpitas": [
+"California"
+],
+"Milton": [
+"Georgia"
+],
+"Milwaukee": [
+"Wisconsin"
+],
+"Minneapolis": [
+"Minnesota"
+],
+"Minnetonka": [
+"Minnesota"
+],
+"Minot": [
+"North Dakota"
+],
+"Miramar": [
+"Florida"
+],
+"Mishawaka": [
+"Indiana"
+],
+"Mission": [
+"Texas"
+],
+"Mission Viejo": [
+"California"
+],
+"Missoula": [
+"Montana"
+],
+"Missouri City": [
+"Texas"
+],
+"Mobile": [
+"Alabama"
+],
+"Modesto": [
+"California"
+],
+"Moline": [
+"Illinois"
+],
+"Monroe": [
+"Louisiana",
+"New Jersey"
+],
+"Montebello": [
+"California"
+],
+"Monterey Park": [
+"California"
+],
+"Montgomery": [
+"Alabama"
+],
+"Moore": [
+"Oklahoma"
+],
+"Mooresville": [
+"North Carolina"
+],
+"Moorhead": [
+"Minnesota"
+],
+"Moreno Valley": [
+"California"
+],
+"Morgan Hill": [
+"California"
+],
+"Mount Juliet": [
+"Tennessee"
+],
+"Mount Laurel": [
+"New Jersey"
+],
+"Mount Pleasant": [
+"New York",
+"South Carolina"
+],
+"Mount Prospect": [
+"Illinois"
+],
+"Mount Vernon": [
+"New York"
+],
+"Mountain View": [
+"California"
+],
+"Muncie": [
+"Indiana"
+],
+"Murfreesboro": [
+"Tennessee"
+],
+"Murray": [
+"Utah"
+],
+"Murrieta": [
+"California"
+],
+"Nampa": [
+"Idaho"
+],
+"Napa": [
+"California"
+],
+"Naperville": [
+"Illinois"
+],
+"Nashua": [
+"New Hampshire"
+],
+"Nashville": [
+"Tennessee"
+],
+"National City": [
+"California"
+],
+"New Bedford": [
+"Massachusetts"
+],
+"New Berlin": [
+"Wisconsin"
+],
+"New Braunfels": [
+"Texas"
+],
+"New Britain": [
+"Connecticut"
+],
+"New Brunswick": [
+"New Jersey"
+],
+"New Haven": [
+"Connecticut"
+],
+"New Orleans": [
+"Louisiana"
+],
+"New Rochelle": [
+"New York"
+],
+"New York": [
+"New York"
+],
+"Newark": [
+"California",
+"New Jersey",
+"Ohio"
+],
+"Newnan": [
+"Georgia"
+],
+"Newport Beach": [
+"California"
+],
+"Newport News": [
+"Virginia"
+],
+"Newton": [
+"Massachusetts"
+],
+"Niagara Falls": [
+"New York"
+],
+"Noblesville": [
+"Indiana"
+],
+"Norfolk": [
+"Virginia"
+],
+"Normal": [
+"Illinois"
+],
+"Norman": [
+"Oklahoma"
+],
+"North Bergen": [
+"New Jersey"
+],
+"North Brunswick": [
+"New Jersey"
+],
+"North Charleston": [
+"South Carolina"
+],
+"North Hempstead": [
+"New York"
+],
+"North Las Vegas": [
+"Nevada"
+],
+"North Lauderdale": [
+"Florida"
+],
+"North Little Rock": [
+"Arkansas"
+],
+"North Miami": [
+"Florida"
+],
+"North Miami Beach": [
+"Florida"
+],
+"North Port": [
+"Florida"
+],
+"North Richland Hills": [
+"Texas"
+],
+"Norwalk": [
+"California",
+"Connecticut"
+],
+"Novato": [
+"California"
+],
+"Novi": [
+"Michigan"
+],
+"O'Fallon": [
+"Missouri"
+],
+"Oak Lawn": [
+"Illinois"
+],
+"Oak Park": [
+"Illinois"
+],
+"Oakland": [
+"California"
+],
+"Oakland Park": [
+"Florida"
+],
+"Oakley": [
+"California"
+],
+"Ocala": [
+"Florida"
+],
+"Oceanside": [
+"California"
+],
+"Ocoee": [
+"Florida"
+],
+"Odessa": [
+"Texas"
+],
+"Ogden": [
+"Utah"
+],
+"Oklahoma City": [
+"Oklahoma"
+],
+"Olathe": [
+"Kansas"
+],
+"Old Bridge": [
+"New Jersey"
+],
+"Olive Branch": [
+"Mississippi"
+],
+"Olympia": [
+"Washington"
+],
+"Omaha": [
+"Nebraska"
+],
+"Ontario": [
+"California"
+],
+"Orange": [
+"California"
+],
+"Orangetown": [
+"New York"
+],
+"Orem": [
+"Utah"
+],
+"Orland Park": [
+"Illinois"
+],
+"Orlando": [
+"Florida"
+],
+"Ormond Beach": [
+"Florida"
+],
+"Oro Valley": [
+"Arizona"
+],
+"Oshkosh": [
+"Wisconsin"
+],
+"Overland Park": [
+"Kansas"
+],
+"Oviedo": [
+"Florida"
+],
+"Owasso": [
+"Oklahoma"
+],
+"Owensboro": [
+"Kentucky"
+],
+"Oxnard": [
+"California"
+],
+"Oyster Bay": [
+"New York"
+],
+"Palatine": [
+"Illinois"
+],
+"Palm Bay": [
+"Florida"
+],
+"Palm Beach Gardens": [
+"Florida"
+],
+"Palm Coast": [
+"Florida"
+],
+"Palm Desert": [
+"California"
+],
+"Palm Springs": [
+"California"
+],
+"Palm Tree": [
+"New York"
+],
+"Palmdale": [
+"California"
+],
+"Palo Alto": [
+"California"
+],
+"Paradise": [
+"Nevada"
+],
+"Paramount": [
+"California"
+],
+"Parker": [
+"Colorado"
+],
+"Parma": [
+"Ohio"
+],
+"Parsippany-Troy Hills": [
+"New Jersey"
+],
+"Pasadena": [
+"California",
+"Texas"
+],
+"Pasco": [
+"Washington"
+],
+"Passaic": [
+"New Jersey"
+],
+"Paterson": [
+"New Jersey"
+],
+"Pawtucket": [
+"Rhode Island"
+],
+"Peabody": [
+"Massachusetts"
+],
+"Peachtree City": [
+"Georgia"
+],
+"Peachtree Corners": [
+"Georgia"
+],
+"Pearland": [
+"Texas"
+],
+"Pembroke Pines": [
+"Florida"
+],
+"Pensacola": [
+"Florida"
+],
+"Peoria": [
+"Arizona",
+"Illinois"
+],
+"Perinton": [
+"New York"
+],
+"Perris": [
+"California"
+],
+"Perth Amboy": [
+"New Jersey"
+],
+"Petaluma": [
+"California"
+],
+"Pflugerville": [
+"Texas"
+],
+"Pharr": [
+"Texas"
+],
+"Philadelphia": [
+"Pennsylvania"
+],
+"Phoenix": [
+"Arizona"
+],
+"Pico Rivera": [
+"California"
+],
+"Pinellas Park": [
+"Florida"
+],
+"Piscataway": [
+"New Jersey"
+],
+"Pittsburg": [
+"California"
+],
+"Pittsburgh": [
+"Pennsylvania"
+],
+"Pittsfield": [
+"Massachusetts"
+],
+"Placentia": [
+"California"
+],
+"Plainfield": [
+"Illinois",
+"New Jersey"
+],
+"Plano": [
+"Texas"
+],
+"Plant City": [
+"Florida"
+],
+"Plantation": [
+"Florida"
+],
+"Pleasanton": [
+"California"
+],
+"Plymouth": [
+"Massachusetts",
+"Minnesota"
+],
+"Pocatello": [
+"Idaho"
+],
+"Pomona": [
+"California"
+],
+"Pompano Beach": [
+"Florida"
+],
+"Pontiac": [
+"Michigan"
+],
+"Port Arthur": [
+"Texas"
+],
+"Port Orange": [
+"Florida"
+],
+"Port St. Lucie": [
+"Florida"
+],
+"Portage": [
+"Michigan"
+],
+"Porterville": [
+"California"
+],
+"Portland": [
+"Maine",
+"Oregon"
+],
+"Portsmouth": [
+"Virginia"
+],
+"Post Falls": [
+"Idaho"
+],
+"Poughkeepsie": [
+"New York"
+],
+"Poway": [
+"California"
+],
+"Prescott": [
+"Arizona"
+],
+"Prescott Valley": [
+"Arizona"
+],
+"Prosper": [
+"Texas"
+],
+"Providence": [
+"Rhode Island"
+],
+"Provo": [
+"Utah"
+],
+"Pueblo": [
+"Colorado"
+],
+"Puyallup": [
+"Washington"
+],
+"Queen Creek": [
+"Arizona"
+],
+"Quincy": [
+"Massachusetts"
+],
+"Racine": [
+"Wisconsin"
+],
+"Raleigh": [
+"North Carolina"
+],
+"Ramapo": [
+"New York"
+],
+"Rancho Cordova": [
+"California"
+],
+"Rancho Cucamonga": [
+"California"
+],
+"Rancho Santa Margarita": [
+"California"
+],
+"Rapid City": [
+"South Dakota"
+],
+"Reading": [
+"Pennsylvania"
+],
+"Redding": [
+"California"
+],
+"Redlands": [
+"California"
+],
+"Redmond": [
+"Washington"
+],
+"Redondo Beach": [
+"California"
+],
+"Redwood City": [
+"California"
+],
+"Reno": [
+"Nevada"
+],
+"Renton": [
+"Washington"
+],
+"Revere": [
+"Massachusetts"
+],
+"Reynoldsburg": [
+"Ohio"
+],
+"Rialto": [
+"California"
+],
+"Richardson": [
+"Texas"
+],
+"Richland": [
+"Washington"
+],
+"Richmond": [
+"California",
+"Virginia"
+],
+"Rio Rancho": [
+"New Mexico"
+],
+"Riverside": [
+"California"
+],
+"Riverton": [
+"Utah"
+],
+"Roanoke": [
+"Virginia"
+],
+"Rochester": [
+"Minnesota",
+"New York"
+],
+"Rochester Hills": [
+"Michigan"
+],
+"Rock Hill": [
+"South Carolina"
+],
+"Rockford": [
+"Illinois"
+],
+"Rocklin": [
+"California"
+],
+"Rockville": [
+"Maryland"
+],
+"Rockwall": [
+"Texas"
+],
+"Rocky Mount": [
+"North Carolina"
+],
+"Rogers": [
+"Arkansas"
+],
+"Rohnert Park": [
+"California"
+],
+"Romeoville": [
+"Illinois"
+],
+"Rosemead": [
+"California"
+],
+"Rosenberg": [
+"Texas"
+],
+"Roseville": [
+"California",
+"Michigan"
+],
+"Roswell": [
+"Georgia",
+"New Mexico"
+],
+"Round Rock": [
+"Texas"
+],
+"Rowlett": [
+"Texas"
+],
+"Royal Oak": [
+"Michigan"
+],
+"Rye": [
+"New York"
+],
+"Sacramento": [
+"California"
+],
+"Saginaw": [
+"Michigan"
+],
+"Salem": [
+"Massachusetts",
+"Oregon"
+],
+"Salina": [
+"Kansas"
+],
+"Salinas": [
+"California"
+],
+"Salt Lake City": [
+"Utah"
+],
+"Sammamish": [
+"Washington"
+],
+"San Angelo": [
+"Texas"
+],
+"San Antonio": [
+"Texas"
+],
+"San Bernardino": [
+"California"
+],
+"San Bruno": [
+"California"
+],
+"San Buenaventura (Ventura)": [
+"California"
+],
+"San Clemente": [
+"California"
+],
+"San Diego": [
+"California"
+],
+"San Francisco": [
+"California"
+],
+"San Jacinto": [
+"California"
+],
+"San Jose": [
+"California"
+],
+"San Leandro": [
+"California"
+],
+"San Luis Obispo": [
+"California"
+],
+"San Marcos": [
+"California",
+"Texas"
+],
+"San Mateo": [
+"California"
+],
+"San Rafael": [
+"California"
+],
+"San Ramon": [
+"California"
+],
+"Sandy": [
+"Utah"
+],
+"Sandy Springs": [
+"Georgia"
+],
+"Sanford": [
+"Florida"
+],
+"Santa Ana": [
+"California"
+],
+"Santa Barbara": [
+"California"
+],
+"Santa Clara": [
+"California"
+],
+"Santa Clarita": [
+"California"
+],
+"Santa Cruz": [
+"California"
+],
+"Santa Fe": [
+"New Mexico"
+],
+"Santa Maria": [
+"California"
+],
+"Santa Monica": [
+"California"
+],
+"Santa Rosa": [
+"California"
+],
+"Santee": [
+"California"
+],
+"Sarasota": [
+"Florida"
+],
+"Saratoga Springs": [
+"Utah"
+],
+"Savannah": [
+"Georgia"
+],
+"Sayreville": [
+"New Jersey"
+],
+"Schaumburg": [
+"Illinois"
+],
+"Schenectady": [
+"New York"
+],
+"Schertz": [
+"Texas"
+],
+"Scottsdale": [
+"Arizona"
+],
+"Scranton": [
+"Pennsylvania"
+],
+"Seattle": [
+"Washington"
+],
+"Shakopee": [
+"Minnesota"
+],
+"Shawnee": [
+"Kansas"
+],
+"Sheboygan": [
+"Wisconsin"
+],
+"Shelton": [
+"Connecticut"
+],
+"Sherman": [
+"Texas"
+],
+"Shoreline": [
+"Washington"
+],
+"Shreveport": [
+"Louisiana"
+],
+"Sierra Vista": [
+"Arizona"
+],
+"Silver Spring": [
+"Maryland"
+],
+"Simi Valley": [
+"California"
+],
+"Sioux City": [
+"Iowa"
+],
+"Sioux Falls": [
+"South Dakota"
+],
+"Skokie": [
+"Illinois"
+],
+"Smithtown": [
+"New York"
+],
+"Smyrna": [
+"Georgia",
+"Tennessee"
+],
+"Somerville": [
+"Massachusetts"
+],
+"South Bend": [
+"Indiana"
+],
+"South Brunswick": [
+"New Jersey"
+],
+"South Fulton": [
+"Georgia"
+],
+"South Gate": [
+"California"
+],
+"South Jordan": [
+"Utah"
+],
+"South San Francisco": [
+"California"
+],
+"Southampton": [
+"New York"
+],
+"Southaven": [
+"Mississippi"
+],
+"Southfield": [
+"Michigan"
+],
+"Southington": [
+"Connecticut"
+],
+"Spanish Fork": [
+"Utah"
+],
+"Sparks": [
+"Nevada"
+],
+"Spokane": [
+"Washington"
+],
+"Spokane Valley": [
+"Washington"
+],
+"Spring Hill": [
+"Tennessee"
+],
+"Springdale": [
+"Arkansas"
+],
+"Springfield": [
+"Illinois",
+"Massachusetts",
+"Missouri",
+"Ohio",
+"Oregon"
+],
+"St. Charles": [
+"Missouri"
+],
+"St. Clair Shores": [
+"Michigan"
+],
+"St. Cloud": [
+"Florida",
+"Minnesota"
+],
+"St. George": [
+"Utah"
+],
+"St. Joseph": [
+"Missouri"
+],
+"St. Louis": [
+"Missouri"
+],
+"St. Louis Park": [
+"Minnesota"
+],
+"St. Paul": [
+"Minnesota"
+],
+"St. Peters": [
+"Missouri"
+],
+"St. Petersburg": [
+"Florida"
+],
+"Stamford": [
+"Connecticut"
+],
+"State College": [
+"Pennsylvania"
+],
+"Sterling Heights": [
+"Michigan"
+],
+"Stillwater": [
+"Oklahoma"
+],
+"Stockton": [
+"California"
+],
+"Stonecrest": [
+"Georgia"
+],
+"Stratford": [
+"Connecticut"
+],
+"Strongsville": [
+"Ohio"
+],
+"Suffolk": [
+"Virginia"
+],
+"Sugar Land": [
+"Texas"
+],
+"Summerville": [
+"South Carolina"
+],
+"Sumter": [
+"South Carolina"
+],
+"Sunnyvale": [
+"California"
+],
+"Sunrise": [
+"Florida"
+],
+"Surprise": [
+"Arizona"
+],
+"Syracuse": [
+"New York"
+],
+"Tacoma": [
+"Washington"
+],
+"Tallahassee": [
+"Florida"
+],
+"Tamarac": [
+"Florida"
+],
+"Tampa": [
+"Florida"
+],
+"Taunton": [
+"Massachusetts"
+],
+"Taylor": [
+"Michigan"
+],
+"Taylorsville": [
+"Utah"
+],
+"Teaneck": [
+"New Jersey"
+],
+"Temecula": [
+"California"
+],
+"Tempe": [
+"Arizona"
+],
+"Temple": [
+"Texas"
+],
+"Terre Haute": [
+"Indiana"
+],
+"Texas City": [
+"Texas"
+],
+"The Colony": [
+"Texas"
+],
+"The Woodlands": [
+"Texas"
+],
+"Thornton": [
+"Colorado"
+],
+"Thousand Oaks": [
+"California"
+],
+"Tigard": [
+"Oregon"
+],
+"Tinley Park": [
+"Illinois"
+],
+"Titusville": [
+"Florida"
+],
+"Toledo": [
+"Ohio"
+],
+"Toms River": [
+"New Jersey"
+],
+"Tonawanda": [
+"New York"
+],
+"Topeka": [
+"Kansas"
+],
+"Torrance": [
+"California"
+],
+"Towson": [
+"Maryland"
+],
+"Tracy": [
+"California"
+],
+"Trenton": [
+"New Jersey"
+],
+"Troy": [
+"Michigan",
+"New York"
+],
+"Tucson": [
+"Arizona"
+],
+"Tulare": [
+"California"
+],
+"Tulsa": [
+"Oklahoma"
+],
+"Turlock": [
+"California"
+],
+"Tuscaloosa": [
+"Alabama"
+],
+"Tustin": [
+"California"
+],
+"Twin Falls": [
+"Idaho"
+],
+"Tyler": [
+"Texas"
+],
+"Union": [
+"New Jersey",
+"New York"
+],
+"Union City": [
+"California",
+"New Jersey"
+],
+"Upland": [
+"California"
+],
+"Upper Darby": [
+"Pennsylvania"
+],
+"Urban Honolulu": [
+"Hawaii"
+],
+"Urbandale": [
+"Iowa"
+],
+"Utica": [
+"New York"
+],
+"Vacaville": [
+"California"
+],
+"Valdosta": [
+"Georgia"
+],
+"Vallejo": [
+"California"
+],
+"Valley Stream": [
+"New York"
+],
+"Vancouver": [
+"Washington"
+],
+"Victoria": [
+"Texas"
+],
+"Victorville": [
+"California"
+],
+"Vineland": [
+"New Jersey"
+],
+"Virginia Beach": [
+"Virginia"
+],
+"Visalia": [
+"California"
+],
+"Vista": [
+"California"
+],
+"Waco": [
+"Texas"
+],
+"Wake Forest": [
+"North Carolina"
+],
+"Wallingford": [
+"Connecticut"
+],
+"Walnut Creek": [
+"California"
+],
+"Waltham": [
+"Massachusetts"
+],
+"Warner Robins": [
+"Georgia"
+],
+"Warren": [
+"Michigan"
+],
+"Warwick": [
+"Rhode Island"
+],
+"Waterbury": [
+"Connecticut"
+],
+"Waterloo": [
+"Iowa"
+],
+"Watsonville": [
+"California"
+],
+"Waukegan": [
+"Illinois"
+],
+"Waukesha": [
+"Wisconsin"
+],
+"Wauwatosa": [
+"Wisconsin"
+],
+"Waxahachie": [
+"Texas"
+],
+"Wayne": [
+"New Jersey"
+],
+"Webster": [
+"New York"
+],
+"Wellington": [
+"Florida"
+],
+"Wentzville": [
+"Missouri"
+],
+"Weslaco": [
+"Texas"
+],
+"West Allis": [
+"Wisconsin"
+],
+"West Covina": [
+"California"
+],
+"West Des Moines": [
+"Iowa"
+],
+"West Fargo": [
+"North Dakota"
+],
+"West Hartford": [
+"Connecticut"
+],
+"West Haven": [
+"Connecticut"
+],
+"West Jordan": [
+"Utah"
+],
+"West Lafayette": [
+"Indiana"
+],
+"West New York": [
+"New Jersey"
+],
+"West Orange": [
+"New Jersey"
+],
+"West Palm Beach": [
+"Florida"
+],
+"West Sacramento": [
+"California"
+],
+"West Seneca": [
+"New York"
+],
+"West Valley City": [
+"Utah"
+],
+"Westfield": [
+"Indiana",
+"Massachusetts"
+],
+"Westland": [
+"Michigan"
+],
+"Westminster": [
+"California",
+"Colorado"
+],
+"Weston": [
+"Florida"
+],
+"Weymouth Town": [
+"Massachusetts"
+],
+"Wheaton": [
+"Illinois",
+"Maryland"
+],
+"White Plains": [
+"New York"
+],
+"Whittier": [
+"California"
+],
+"Wichita": [
+"Kansas"
+],
+"Wichita Falls": [
+"Texas"
+],
+"Wilkes-Barre": [
+"Pennsylvania"
+],
+"Wilmington": [
+"Delaware",
+"North Carolina"
+],
+"Wilson": [
+"North Carolina"
+],
+"Windsor": [
+"Colorado"
+],
+"Winslow": [
+"New Jersey"
+],
+"Winston-Salem": [
+"North Carolina"
+],
+"Winter Garden": [
+"Florida"
+],
+"Winter Haven": [
+"Florida"
+],
+"Woburn": [
+"Massachusetts"
+],
+"Woodbridge": [
+"New Jersey"
+],
+"Woodbury": [
+"Minnesota"
+],
+"Woodland": [
+"California"
+],
+"Woonsocket": [
+"Rhode Island"
+],
+"Worcester": [
+"Massachusetts"
+],
+"Wylie": [
+"Texas"
+],
+"Wyoming": [
+"Michigan"
+],
+"Yakima": [
+"Washington"
+],
+"Yonkers": [
+"New York"
+],
+"Yorba Linda": [
+"California"
+],
+"York": [
+"Pennsylvania"
+],
+"Youngstown": [
+"Ohio"
+],
+"Yuba City": [
+"California"
+],
+"Yucaipa": [
+"California"
+],
+"Yuma": [
+"Arizona"
+]
+},
+"source": "US Census Bureau Vintage 2023 sub-est2023.csv, pop >= 40000, plus a hand list"
+}
