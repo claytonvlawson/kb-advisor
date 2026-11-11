@@ -56,6 +56,7 @@ Run:
   python3 kb_server.py
 """
 import functools
+import hmac
 import importlib.util
 import json
 import os
@@ -74,6 +75,26 @@ import retrieval
 HOST = os.environ.get("ADVISOR_HOST", "127.0.0.1")
 PORT = int(os.environ.get("ADVISOR_PORT", "8001"))
 TOKEN = os.environ.get("ADVISOR_TOKEN", "")
+
+# A token that was never set, or that still holds the value shipped in
+# deploy/kb.env.example, must not count as "auth configured". The old check
+# treated an empty token as "auth disabled", so a missed env var turned the
+# service into an open LLM proxy. Now it fails closed; local development opts
+# in explicitly with ADVISOR_ALLOW_ANON=1.
+PLACEHOLDER_TOKENS = {
+    "",
+    "change-me",
+    "replace-me",
+    "replace-with-openssl-rand-hex-32",
+    "your-token-here",
+}
+ALLOW_ANON = os.environ.get("ADVISOR_ALLOW_ANON") == "1"
+
+
+def token_configured():
+    return TOKEN.strip().lower() not in PLACEHOLDER_TOKENS
+
+
 MAX_Q = int(os.environ.get("ADVISOR_MAX_Q", "500"))
 MAX_NOTE = int(os.environ.get("ADVISOR_MAX_NOTE", "1000"))
 TOP_K = int(os.environ.get("ADVISOR_TOP_K", "5"))
@@ -322,6 +343,10 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/health":
             self._send(200, {"ok": True, "chunks": len(CHUNKS)})
         elif self.path == "/health/deep":
+            # Deep health runs a real retrieval + generation, which costs money.
+            # It used to be reachable with no token at all.
+            if not self._authorized():
+                return self._send(401, {"error": "unauthorized"}, close=True)
             self._handle_deep_health()
         else:
             self._send(404, {"error": "not found"})
@@ -332,7 +357,10 @@ class Handler(BaseHTTPRequestHandler):
         try:
             answer, sources = answer_question(DEEP_HEALTH_QUESTION)
         except Exception as exc:
-            self._send(502, {"ok": False, "error": str(exc), "ms": round(1000 * (time.perf_counter() - t0))})
+            # Log the detail, return a generic body: /health/deep is reachable
+            # by token holders and used to hand them raw exception text.
+            print("health/deep failed: %r" % (exc,), flush=True)
+            self._send(502, {"ok": False, "error": "generation failed", "ms": round(1000 * (time.perf_counter() - t0))})
             return
         elapsed_ms = round(1000 * (time.perf_counter() - t0))
         ok = bool(answer)
@@ -359,7 +387,14 @@ class Handler(BaseHTTPRequestHandler):
             return None
 
     def _authorized(self):
-        return not TOKEN or self.headers.get("Authorization", "") == "Bearer " + TOKEN
+        # Fail closed: an unset or placeholder token denies every request
+        # unless ADVISOR_ALLOW_ANON=1 was set deliberately for local dev.
+        if ALLOW_ANON:
+            return True
+        if not token_configured():
+            return False
+        provided = self.headers.get("Authorization", "")
+        return hmac.compare_digest(provided, "Bearer " + TOKEN)
 
     def do_POST(self):
         if self.path == "/chat":
@@ -450,6 +485,13 @@ def main():
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     print("kb-advisor listening on http://%s:%d  (POST /chat, POST /feedback)"
           % (HOST, PORT), flush=True)
+    if not token_configured() and not ALLOW_ANON:
+        print("WARNING: ADVISOR_TOKEN is empty or still the example placeholder.",
+              flush=True)
+        print("         Every request will be rejected with 401 until you set it.",
+              flush=True)
+        print("         For local development only: ADVISOR_ALLOW_ANON=1.",
+              flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -83,7 +83,11 @@ curl -X POST http://127.0.0.1:8001/chat \
   -d '{"question": "what is this knowledge base about"}'
 ```
 
-Set `ADVISOR_TOKEN` to require `Authorization: Bearer <token>` on POST routes.
+Set `ADVISOR_TOKEN` to require an Authorization header carrying the bearer token on
+the POST routes and on `/health/deep`. Auth now fails closed: an empty token or the
+shipped example placeholder rejects every request with 401 and prints a startup
+warning. For local development only, set `ADVISOR_ALLOW_ANON=1` to run without a
+token.
 
 ## The design rules it inherits from production
 
