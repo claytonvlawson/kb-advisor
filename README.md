@@ -269,6 +269,12 @@ CI runs the suite on Python 3.11 and 3.12 (`.github/workflows/tests.yml`).
 
 ## Status: what works, what is not done
 
+A full senior-engineer review with acceptance criteria per gap is in
+[docs/GAP-ANALYSIS-v1.1.md](docs/GAP-ANALYSIS-v1.1.md). Short version: the
+blockers for a client deployment are unmeasured crisis recall, unbounded
+client-supplied crisis regexes, no server-side spend or concurrency limit, and
+logs that store user text forever.
+
 Working end to end, in use on a live client deployment: PDF ingest, heading-aware
 chunking, BM25 retrieval, persona-driven generation with two-tier fallback,
 deterministic crisis injection, in-text citation grounding, optional per-client
