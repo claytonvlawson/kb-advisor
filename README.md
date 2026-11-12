@@ -1,9 +1,12 @@
 # kb-advisor
 
+[![tests](https://github.com/claytonvlawson/kb-advisor/actions/workflows/tests.yml/badge.svg)](https://github.com/claytonvlawson/kb-advisor/actions/workflows/tests.yml)
+
 A template RAG stack for spinning up grounded, cited, safety-configurable
 knowledge-base advisors from PDFs. Ported from the production learnwithclay.ai
 Parent Advisor, which turns an Obsidian research vault (~1300 notes) into a
 public RAG agent with deterministic crisis routing and linkable citations.
+
 
 The goal of this template: **drop in a client's PDFs, write a persona, get a
 cited advisor API** (and optionally a front-end widget).
@@ -84,10 +87,86 @@ curl -X POST http://127.0.0.1:8001/chat \
 ```
 
 Set `ADVISOR_TOKEN` to require an Authorization header carrying the bearer token on
-the POST routes and on `/health/deep`. Auth now fails closed: an empty token or the
+the POST routes and on `/health/deep`. Auth fails closed: an empty token or the
 shipped example placeholder rejects every request with 401 and prints a startup
 warning. For local development only, set `ADVISOR_ALLOW_ANON=1` to run without a
 token.
+
+## HTTP API
+
+Four routes, all JSON. `GET /health` is public; everything that spends money or
+writes data requires `Authorization: Bearer $ADVISOR_TOKEN`.
+
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| GET | `/health` | no | liveness + chunk count, no generation |
+| GET | `/health/deep` | yes | runs one real retrieval + generation |
+| POST | `/chat` | yes | ask a question, get a cited answer |
+| POST | `/feedback` | yes | record an up/down vote on an answer id |
+
+`GET /health`
+
+```json
+{"ok": true, "chunks": 2431}
+```
+
+`GET /health/deep` -- costs one generation. Use it after a deploy, not as a
+liveness probe.
+
+```json
+{"ok": true, "chunks": 2431, "generation_ok": true, "ms": 1840, "sources": 5}
+```
+
+`POST /chat` -- body limit 10 KB, question truncated at `ADVISOR_MAX_Q` (500).
+
+```sh
+curl -X POST http://127.0.0.1:8001/chat \
+  -H "Authorization: Bearer $ADVISOR_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"question": "my 2 year old just failed a hearing test, what now"}'
+```
+
+```json
+{
+  "id": "9f3c1a7b20de",
+  "answer": "The first 90 days are mostly about audiology and early intervention...",
+  "sources": ["Notes/First 90 Days After Diagnosis.md", "..."],
+  "citations": [
+    {"title": "Language and brain development in deaf children",
+     "authors": "Hall, M.", "year": "2019", "url": "https://doi.org/10.1093/deafed/enz012"}
+  ],
+  "location": null,
+  "location_ambiguous": null
+}
+```
+
+`id` is a 12-char hex handle for the answer; pass it to `/feedback`. `sources`
+are vault-relative paths. `citations` always includes any retrieved note the
+answer named in-text (see design rule 4).
+
+`POST /feedback`
+
+```sh
+curl -X POST http://127.0.0.1:8001/feedback \
+  -H "Authorization: Bearer $ADVISOR_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"id": "9f3c1a7b20de", "vote": "down", "note": "wrong state, gave me a Texas number"}'
+```
+
+```json
+{"ok": true}
+```
+
+`vote` must be `up` or `down`; an optional `note` is truncated at
+`ADVISOR_MAX_NOTE` (1000 chars). Rows are appended to
+`clients/<name>/logs/{qa_log,feedback}.jsonl`.
+
+Errors are `{"error": "..."}` with a matching status: `400` for an empty
+question, malformed JSON or an oversized body; `401` for a missing, wrong or
+unconfigured token; `404` for an unknown route; `502` when retrieval or
+generation produced nothing. A 502 body never contains internal exception text
+or a model key.
+
 
 ## The design rules it inherits from production
 
@@ -168,30 +247,70 @@ edge function (Vercel/Netlify), never in the browser.
 
 ## Tests
 
+66 tests, offline, no model calls, about 2 seconds. `requests.post` is faked and
+the HTTP surface is exercised over a real socket on an ephemeral port.
+
 ```sh
-pip install rank_bm25 requests
-python3 tests/test_smoke.py          # end to end: index -> retrieve -> cite
-python3 ingest/ingest_pdfs.py --help
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r requirements-dev.txt
+python -m pytest
 ```
+
+| File | What it pins down |
+|---|---|
+| `tests/test_retrieval.py` | tokenizer stays compatible with the index, chunk round trip, ranking, k, no zero-score hits |
+| `tests/test_citations.py` | uncited notes are dropped, in-text-named notes are force-merged, DOI/URL safety |
+| `tests/test_crisis.py` | the safety path fires on real parent phrasing and stays quiet on ordinary questions, inject source is indexed, misconfiguration is loud |
+| `tests/test_llm_router.py` | free tier serves first, paid tier only on 429/5xx, both-failed reports a machine-readable error |
+| `tests/test_server.py` | auth fails closed on `/chat`, `/feedback` and `/health/deep`; request/response shapes; logging; no exception text leaks |
+| `tests/test_hooks.py` | the example client's US-state routing |
+
+CI runs the suite on Python 3.11 and 3.12 (`.github/workflows/tests.yml`).
+
+## Status: what works, what is not done
+
+Working end to end, in use on a live client deployment: PDF ingest, heading-aware
+chunking, BM25 retrieval, persona-driven generation with two-tier fallback,
+deterministic crisis injection, in-text citation grounding, optional per-client
+hooks, JSONL logging, systemd + Caddy deploy, Vercel proxy + React widget.
+
+Not done, in rough priority order:
+
+1. **Crisis recall is unmeasured.** The regexes are hand-written; there is no
+   eval set of real phrasings, so false negatives are unknown. This is the one
+   gap I would not ship to a wide public audience without fixing.
+2. **No incremental indexing.** Any vault edit means a full rebuild (~5s per
+   8k chunks).
+3. **BM25 only.** No embeddings, by design (a 1 GB box with no GPU serves this).
+   The cost is vocabulary-gap recall.
+4. **No log retention policy.** `qa_log.jsonl` stores full question text
+   indefinitely; decide retention before pointing this at real users.
+5. **No streaming.** Answers arrive whole; long generations block until done.
+6. **One deployment topology.** No container image, no Terraform; the deploy
+   section is rsync plus systemd.
 
 ## Known limits (inherited from production, deliberate)
 
-- No incremental indexing: rebuild the whole index after vault edits.
 - `MAX_TOKENS=1000` shared budget: reasoning-trace models emit empty answers
   (`finish_reason=length`); use non-reasoning models or a separate reasoning
   budget.
 - The fallback retries only on hard errors; a slow-but-successful free tier
   never falls through to the paid one.
 - `requests` timeout bounds bytes-between-reads, not total latency.
-- qa_log stores full question text with no rotation/retention policy; make a
-  retention decision before pointing this at real users.
-- Crisis regex false negatives are unmeasured; build an eval before wide
-  public exposure (see production ARCHITECTURE.md, roadmap item 2).
 
 ## Lineage
 
 The retrieval core (`kb/retrieval.py`), the LLM router (`kb/llm_router.py`),
-the citation machinery (`kb/citations.py`), and `kb/kb_server.py` are ports
-of the live learnwithclay.ai Parent Advisor (`~/vault-advisor-cloud`, on the
-`advisor-vm` droplet). That stack's full architecture, decisions, and paid
-for traps list lives in its ARCHITECTURE.md.
+the citation machinery (`kb/citations.py`), and `kb/kb_server.py` are ports of
+the live learnwithclay.ai Parent Advisor, which serves hearing parents of Deaf
+and hard of hearing children. The client-specific parts of that stack (persona,
+crisis regexes, location routing) were lifted out into the per-client config
+directory you see under `clients/`. The chunker and tokenizer are kept
+byte-identical to the originals on purpose: an index built by one copy has to be
+searchable by the other.
+
+## License
+
+MIT. See [LICENSE](LICENSE). Documents you ingest keep their own terms; this
+license covers the code only.
+
