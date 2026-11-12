@@ -59,6 +59,12 @@ item because nothing else in the repo has that property.
 
 ### 2. Client-supplied regexes run unbounded against user input
 
+**Status: fixed.** `kb/regex_safety.py` rejects provably risky patterns at load
+time (naming the pattern, exit code 2), bounds every match with a wall clock
+limit, fails closed on timeout, and `ADVISOR_MAX_THREADS` caps concurrent
+handlers with backpressure. Covered by `tests/test_regex_safety.py` (25 tests,
+including a live six-request run against a cap of two).
+
 `kb/kb_server.py` compiles every client pattern into one alternation and calls
 `.search()` on the raw question, with no timeout and no complexity check. The
 current 14 patterns are tame, but the mechanism is inherited per client. A pattern

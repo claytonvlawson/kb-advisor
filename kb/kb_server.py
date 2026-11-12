@@ -48,6 +48,10 @@ Env (per deployment):
   ADVISOR_TOP_K       default 5
   ADVISOR_MAX_Q / ADVISOR_MAX_NOTE / ADVISOR_MAX_CITATIONS
   ADVISOR_LOG_DIR     JSONL logs (qa, feedback, crisis)
+  ADVISOR_MAX_THREADS concurrent handler cap (default 8); past it requests wait
+                      in the listen backlog rather than becoming threads
+  ADVISOR_REGEX_TIMEOUT_S wall clock bound on one crisis match (default 0.25);
+                      a timeout disables the detector for the process, loudly
   OPENROUTER_*        see kb/llm_router.py
 
 Run:
@@ -71,6 +75,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 # This file lives inside kb/, so plain imports work when run as a script.
 import citations
 import llm_router
+import regex_safety
 import retrieval
 
 HOST = os.environ.get("ADVISOR_HOST", "127.0.0.1")
@@ -164,11 +169,36 @@ SYSTEM_PROMPT = load_system_prompt(CLIENT_DIR)
 CRISIS_CFG = load_crisis_config(CLIENT_DIR)
 HOOKS = load_client_hooks(CLIENT_DIR)
 
-_CRISIS_RE = re.compile("|".join(CRISIS_CFG["patterns"]), re.IGNORECASE) if CRISIS_CFG else None
+# Crisis patterns are client config, and `re.search` has no timeout. Compile
+# them through the guard: a pattern that can backtrack catastrophically is a
+# self-inflicted DoS (a plausible one measured 951 ms on 24 characters), so a
+# risky config fails loudly at startup rather than on live traffic.
+try:
+    _CRISIS_RE = regex_safety.compile_patterns(
+        CRISIS_CFG["patterns"] if CRISIS_CFG else None) if CRISIS_CFG else None
+except regex_safety.RiskyPatternError as exc:
+    print("[kb-advisor] FATAL: %s" % exc, file=sys.stderr, flush=True)
+    print("[kb-advisor] Rewrite the pattern (avoid a quantified group that "
+          "contains a quantifier, and avoid overlapping alternatives like "
+          "(a|ab)+), or delete it.", file=sys.stderr, flush=True)
+    sys.exit(2)
 
 
 def is_crisis(question):
-    return bool(_CRISIS_RE and _CRISIS_RE.search(question))
+    """True when the question matches a crisis pattern.
+
+    Fails CLOSED on a match timeout: the README's design rule is that a false
+    positive degrades gracefully (safety resources plus the real answer) while a
+    false negative fails silently. bounded_search() disables the detector for
+    the rest of the process after one timeout and logs CRITICAL, so the delay
+    is paid once rather than per request.
+    """
+    if _CRISIS_RE is None:
+        return False
+    hit = regex_safety.bounded_search(_CRISIS_RE, question)
+    if hit is None:
+        return True
+    return hit
 
 
 @functools.lru_cache(maxsize=1)
@@ -477,15 +507,51 @@ class Handler(BaseHTTPRequestHandler):
         return self._send(200, {"ok": True})
 
 
+MAX_THREADS = int(os.environ.get("ADVISOR_MAX_THREADS", "8"))
+
+
+class BoundedThreadingHTTPServer(ThreadingHTTPServer):
+    """Threaded server with a hard cap on concurrent handlers.
+
+    ThreadingHTTPServer starts one thread per connection and never limits them.
+    On a 1 GB box a handful of slow generations, or one request that makes a
+    regex crawl, is enough to exhaust memory. Past the cap a request waits in the
+    listen backlog instead of becoming a thread: backpressure, not growth.
+    """
+
+    daemon_threads = True
+    request_queue_size = 32
+
+    def __init__(self, *args, max_workers=None, **kwargs):
+        self.max_workers = max_workers or MAX_THREADS
+        self._slots = threading.BoundedSemaphore(self.max_workers)
+        super().__init__(*args, **kwargs)
+
+    def process_request(self, request, client_address):
+        self._slots.acquire()
+        try:
+            super().process_request(request, client_address)
+        except BaseException:
+            self._slots.release()
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._slots.release()
+
+
 def main():
     # Warm the tier-2 mention catalog now, not on the first request.
     _t0 = time.perf_counter()
     citations._vault_catalog(VAULT_ROOT)
     print("Vault mention catalog ready (%.1fs)."
           % (time.perf_counter() - _t0), flush=True)
-    server = ThreadingHTTPServer((HOST, PORT), Handler)
-    print("kb-advisor listening on http://%s:%d  (POST /chat, POST /feedback)"
-          % (HOST, PORT), flush=True)
+    server = BoundedThreadingHTTPServer((HOST, PORT), Handler)
+    print("kb-advisor listening on http://%s:%d  (POST /chat, POST /feedback, "
+          "max %d concurrent handlers)"
+          % (HOST, PORT, server.max_workers), flush=True)
     if not token_configured() and not ALLOW_ANON:
         print("WARNING: ADVISOR_TOKEN is empty or still the example placeholder.",
               flush=True)

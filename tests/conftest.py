@@ -73,10 +73,9 @@ def server(kb):
     The HTTP surface is what a reviewer or an integrator actually touches, so
     it is tested over a socket rather than by calling handler methods.
     """
-    from http.server import ThreadingHTTPServer
-
-    httpd = ThreadingHTTPServer(("127.0.0.1", 0), kb.Handler)
-    httpd.daemon_threads = True
+    # The bounded subclass, not the stdlib one: the suite should exercise the
+    # server type the deployment actually runs.
+    httpd = kb.BoundedThreadingHTTPServer(("127.0.0.1", 0), kb.Handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
     try:

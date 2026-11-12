@@ -211,6 +211,16 @@ invariant. If you change them, know what you are trading away.
    the corpus's words); aliases and `system_prompt.md` routing pay for most
    of it.
 
+8. **Client regexes are validated, and every match is bounded.** `crisis.json`
+   is config, and `re.search` has no timeout, so a pattern like
+   `(\w+\s?)+[.!?]` is a denial of service rather than a safeguard (7 ms at 16
+   characters, 951 ms at 24). `kb/regex_safety.py` refuses provably risky
+   shapes at startup, naming the pattern, and runs the match under a wall clock
+   limit. A timeout fails closed (safety note injected) and disables the
+   detector for the process with a CRITICAL log, because a thread cannot be
+   killed. Concurrent handlers are capped at `ADVISOR_MAX_THREADS` (8) with
+   backpressure instead of unbounded threads.
+
 ## PDF ingestion
 
 `ingest/ingest_pdfs.py` converts each PDF into one note:
@@ -247,7 +257,7 @@ edge function (Vercel/Netlify), never in the browser.
 
 ## Tests
 
-66 tests, offline, no model calls, about 2 seconds. `requests.post` is faked and
+91 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
 the HTTP surface is exercised over a real socket on an ephemeral port.
 
 ```sh
@@ -264,6 +274,7 @@ python -m pytest
 | `tests/test_llm_router.py` | free tier serves first, paid tier only on 429/5xx, both-failed reports a machine-readable error |
 | `tests/test_server.py` | auth fails closed on `/chat`, `/feedback` and `/health/deep`; request/response shapes; logging; no exception text leaks |
 | `tests/test_hooks.py` | the example client's US-state routing |
+| `tests/test_regex_safety.py` | risky crisis patterns rejected at startup, match bounded, detector disabled after a timeout, handler cap holds |
 
 CI runs the suite on Python 3.11 and 3.12 (`.github/workflows/tests.yml`).
 
