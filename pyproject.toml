@@ -1,0 +1,15 @@
+[project]
+name = "kb-advisor"
+version = "1.0.0"
+description = "Template RAG advisor: drop in client PDFs, get a cited, safety-routed knowledge-base API"
+requires-python = ">=3.9"
+dependencies = ["requests>=2.31", "rank_bm25>=0.2.2"]
+
+[project.optional-dependencies]
+ingest = ["pymupdf>=1.24"]
+test = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
