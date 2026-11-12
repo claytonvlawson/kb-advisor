@@ -1,4 +1,4 @@
-// Proxies widget chat requests to the kb-advisor backend (droplet/VM running
+// Proxies widget chat requests to the kb-advisor backend (your server host
 // kb_server.py) with per-IP rate limiting and the bearer token kept
 // server-side -- the browser never sees it.
 //
