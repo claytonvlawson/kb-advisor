@@ -40,7 +40,8 @@ WHY A CONFIG-DRIVEN SPLIT (production lessons, 2026-09..10):
 
 Env (per deployment):
   ADVISOR_CLIENT      client config dir (default: ./clients/default)
-  ADVISOR_TOKEN       bearer token; empty disables auth (dev only)
+  ADVISOR_TOKEN       bearer token; unset or placeholder FAILS CLOSED (401)
+  ADVISOR_ALLOW_ANON  =1 to run without a token, local development only
   ADVISOR_HOST/PORT   default 127.0.0.1:8001
   ADVISOR_VAULT       knowledge base dir (markdown notes)
   ADVISOR_INDEX       BM25 pickle path
