@@ -1,8 +1,11 @@
 __pycache__/
 *.pyc
 .venv/
+venv/
 *.pkl
 clients/*/index/
 clients/*/logs/
 kb.env
+.env
 .DS_Store
+.pytest_cache/
