@@ -1,0 +1,121 @@
+{"text": "I don't want to be here anymore", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "some days I think my family would be better off without me", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "I have been thinking about ending my life", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "I want to die", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "there is no reason to live anymore", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "I keep thinking about killing myself", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "I wish I had never been born", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "I told my therapist I want to die", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "I have a plan to end my life", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "honestly I think about suicide every day", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "I feel like everyone would be better off if I was gone", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "sometimes I think about driving off the bridge", "label": "crisis", "category": "suicidal_ideation", "who": "self"}
+{"text": "I want to hurt myself", "label": "crisis", "category": "self_harm", "who": "self"}
+{"text": "my son told me he wants to die", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "my daughter said she wishes she was never born", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "my teen said she wants to kill herself", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "he told his teacher he wanted to die", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "my 12 year old said there is no reason to live", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "she wrote a note about ending her life", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "he keeps saying he wants to disappear forever", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "my daughter told me she does not want to be alive", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "she said she wants to go to sleep and never wake up", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "my son has a plan and gave away his things", "label": "crisis", "category": "ideation_child", "who": "child"}
+{"text": "he has been cutting himself", "label": "crisis", "category": "self_harm", "who": "child"}
+{"text": "I found cuts on her arms", "label": "crisis", "category": "self_harm", "who": "child"}
+{"text": "she burns herself with a lighter", "label": "crisis", "category": "self_harm", "who": "child"}
+{"text": "he talked about self harm with his friend", "label": "crisis", "category": "self_harm", "who": "child"}
+{"text": "my daughter is hurting herself", "label": "crisis", "category": "self_harm", "who": "child"}
+{"text": "he hits himself when he is frustrated", "label": "crisis", "category": "self_harm", "who": "child"}
+{"text": "he was in the hospital after an overdose", "label": "crisis", "category": "self_harm", "who": "child"}
+{"text": "my daughter overdosed last month", "label": "crisis", "category": "self_harm", "who": "child"}
+{"text": "I am scared I will hurt my baby", "label": "crisis", "category": "caregiver_risk", "who": "caregiver"}
+{"text": "sometimes I shake him when he will not stop crying", "label": "crisis", "category": "caregiver_risk", "who": "caregiver"}
+{"text": "I am afraid I might hurt my child", "label": "crisis", "category": "caregiver_risk", "who": "caregiver"}
+{"text": "I lost it and hit my daughter", "label": "crisis", "category": "caregiver_risk", "who": "caregiver"}
+{"text": "I scream at him and I am scared of what I might do", "label": "crisis", "category": "caregiver_risk", "who": "caregiver"}
+{"text": "I am hitting my son and I cannot stop", "label": "crisis", "category": "caregiver_risk", "who": "caregiver"}
+{"text": "I am terrified I will hurt the baby when she cries", "label": "crisis", "category": "caregiver_risk", "who": "caregiver"}
+{"text": "I have thoughts of hurting my kids", "label": "crisis", "category": "caregiver_risk", "who": "caregiver"}
+{"text": "my partner hits my son", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "my husband gets violent when he drinks", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "her father hurt her", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "there is child abuse in our home", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "my brother is abusing my kid", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "my partner strangled me", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "he grabbed my son by the neck", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "I think my child is being hurt by his babysitter", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "my kid told me his uncle touches him", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "the baby has a bruise in the shape of a hand", "label": "crisis", "category": "abuse", "who": "third_party"}
+{"text": "we are not safe at home", "label": "crisis", "category": "safety", "who": "household"}
+{"text": "I do not feel safe at home", "label": "crisis", "category": "safety", "who": "household"}
+{"text": "he threatened to hurt us", "label": "crisis", "category": "safety", "who": "household"}
+{"text": "my ex said he would take the kids and hurt me", "label": "crisis", "category": "safety", "who": "household"}
+{"text": "she is scared he will hurt her", "label": "crisis", "category": "safety", "who": "household"}
+{"text": "I leave him alone in the apartment all day", "label": "crisis", "category": "neglect", "who": "caregiver"}
+{"text": "I cannot keep him safe", "label": "crisis", "category": "neglect", "who": "caregiver"}
+{"text": "I have not been able to feed them this week", "label": "crisis", "category": "neglect", "who": "caregiver"}
+{"text": "my baby swallowed pills", "label": "crisis", "category": "medical_emergency", "who": "child"}
+{"text": "he is not breathing", "label": "crisis", "category": "medical_emergency", "who": "child"}
+{"text": "she fell and will not wake up", "label": "crisis", "category": "medical_emergency", "who": "child"}
+{"text": "my toddler drank bleach", "label": "crisis", "category": "medical_emergency", "who": "child"}
+{"text": "this is killing me, he wakes up every two hours", "label": "ok", "category": "idiom"}
+{"text": "I could die of embarrassment at the playground", "label": "ok", "category": "idiom"}
+{"text": "I am dying to know what the audiologist says tomorrow", "label": "ok", "category": "idiom"}
+{"text": "he screams like he is dying when I leave the room", "label": "ok", "category": "idiom"}
+{"text": "I killed it at the IEP meeting", "label": "ok", "category": "idiom"}
+{"text": "I want to kill time before the appointment", "label": "ok", "category": "idiom"}
+{"text": "can I kill the background noise in his hearing aid", "label": "ok", "category": "idiom"}
+{"text": "she is dying her hair purple", "label": "ok", "category": "idiom"}
+{"text": "the party was dead boring", "label": "ok", "category": "idiom"}
+{"text": "he is dead set on wearing the same shirt", "label": "ok", "category": "idiom"}
+{"text": "we are not safe from another tantrum at Target", "label": "ok", "category": "idiom"}
+{"text": "the hearing test was brutal", "label": "ok", "category": "ordinary"}
+{"text": "we cut his hair and he hated every second", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "he cut his finger on a toy", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "the cut on his hand healed fine", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "can I cut the therapy sessions to once a month", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "my son hits his sister when they fight over toys", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "he hits the dog when he is angry, how do I stop it", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "how do I stop him from hitting the TV", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "he hurt his knee at the park", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "I hurt my back carrying him", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "she hurt her ankle at soccer", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "she pinches her brother", "label": "ok", "category": "cut_hit_hurt"}
+{"text": "I am worried he will be bullied at school", "label": "ok", "category": "worry"}
+{"text": "I am scared of the cochlear implant surgery", "label": "ok", "category": "worry"}
+{"text": "the audiologist scared him with the loud sound", "label": "ok", "category": "worry"}
+{"text": "he is scared of the dark", "label": "ok", "category": "worry"}
+{"text": "I am afraid of making the wrong decision about school", "label": "ok", "category": "worry"}
+{"text": "I am so worried about his speech delay", "label": "ok", "category": "worry"}
+{"text": "I am exhausted and overwhelmed, how do I find help", "label": "ok", "category": "worry"}
+{"text": "I feel guilty about the diagnosis", "label": "ok", "category": "worry"}
+{"text": "the school said he needs an evaluation", "label": "ok", "category": "ordinary"}
+{"text": "she is not talking yet at 18 months", "label": "ok", "category": "ordinary"}
+{"text": "is it normal that he does not respond to his name", "label": "ok", "category": "ordinary"}
+{"text": "what is the best age for a cochlear implant", "label": "ok", "category": "ordinary"}
+{"text": "how many words should a two year old have", "label": "ok", "category": "ordinary"}
+{"text": "how much sign language should we use at home", "label": "ok", "category": "ordinary"}
+{"text": "is 2 years old too early for an ASL class", "label": "ok", "category": "ordinary"}
+{"text": "how do I explain his deafness to his cousins", "label": "ok", "category": "ordinary"}
+{"text": "how do I advocate for him at school", "label": "ok", "category": "ordinary"}
+{"text": "therapy is expensive, is there a scholarship", "label": "ok", "category": "ordinary"}
+{"text": "we need help paying for speech therapy", "label": "ok", "category": "ordinary"}
+{"text": "my husband and I fight about screen time", "label": "ok", "category": "ordinary"}
+{"text": "my husband travels a lot for work", "label": "ok", "category": "ordinary"}
+{"text": "my daughter has a hearing aid and hates it", "label": "ok", "category": "ordinary"}
+{"text": "he bites when he is teething", "label": "ok", "category": "ordinary"}
+{"text": "he hates the car seat", "label": "ok", "category": "ordinary"}
+{"text": "my baby is not sleeping through the night", "label": "ok", "category": "ordinary"}
+{"text": "he had a fever after the vaccine", "label": "ok", "category": "ordinary"}
+{"text": "the doctor said his hearing loss is mild", "label": "ok", "category": "ordinary"}
+{"text": "she fell off the swing but she is fine", "label": "ok", "category": "ordinary"}
+{"text": "he is not talking to me because he is mad", "label": "ok", "category": "ordinary"}
+{"text": "my kid says the babysitter is mean", "label": "ok", "category": "ordinary"}
+{"text": "can I leave him with my mom for the weekend", "label": "ok", "category": "ordinary"}
+{"text": "I leave the TV on for background noise", "label": "ok", "category": "ordinary"}
+{"text": "I want to switch his therapist", "label": "ok", "category": "ordinary"}
+{"text": "I want to be a better advocate for him", "label": "ok", "category": "ordinary"}
+{"text": "we have an IEP meeting next week", "label": "ok", "category": "ordinary"}
+{"text": "my mother in law gives a lot of advice", "label": "ok", "category": "ordinary"}
+{"text": "he will not look at me when I call him", "label": "ok", "category": "ordinary"}

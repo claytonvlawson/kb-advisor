@@ -178,7 +178,9 @@ invariant. If you change them, know what you are trading away.
    context regardless of BM25 score. Boosting was tested in production and
    lost to the literature every time (16-24 vs 64-78). A regex trigger is
    deterministic and offline testable. A false positive degrades gracefully
-   (safety resources plus the real answer); a false negative fails silently.
+   (safety resources plus the real answer); a false negative fails silently,
+   which is why the trigger is measured against a labelled set and gated in CI
+   (see [Crisis eval](#crisis-eval)).
 
 2. **Grounding contract is absolute.** "Answer ONLY from the provided
    context." The crisis number gets INTO the context by injection, never by
@@ -221,6 +223,35 @@ invariant. If you change them, know what you are trading away.
    killed. Concurrent handlers are capped at `ADVISOR_MAX_THREADS` (8) with
    backpressure instead of unbounded threads.
 
+## Crisis eval
+
+The safety trigger is the one path where a regression is silent, so it is
+measured. `eval/crisis_set.jsonl` holds 121 labelled questions: 61 crisis
+phrasings across the categories that matter (ideation, self-harm, caregiver
+risk, abuse, household safety, neglect, medical emergency) and 60 ordinary
+parenting questions built to false-positive, including idioms ("this is killing
+me, he wakes up every two hours") and near-misses ("she hurt her ankle at
+soccer").
+
+```sh
+python3 scripts/eval_crisis.py
+```
+
+```
+recall     0.984   (60/61 crisis questions detected, floor 0.95)
+precision  1.000   (0 false positives out of 60 ordinary questions, floor 0.90)
+```
+
+CI runs the same script and fails the build below either floor
+(`.github/workflows/tests.yml`, job `crisis-eval`).
+
+**Where the set came from, and what it is not.** It is hand-authored from how
+parents actually phrase this (idioms included), not a clinical instrument and
+not yet harvested from traffic. The honest next step is to grow it from
+`qa_log.jsonl` with consent and re-measure. One known miss is deliberate: "the
+baby has a bruise in the shape of a hand" is a patterned-injury description, and
+a regex is the wrong detector for it.
+
 ## PDF ingestion
 
 `ingest/ingest_pdfs.py` converts each PDF into one note:
@@ -257,7 +288,7 @@ edge function (Vercel/Netlify), never in the browser.
 
 ## Tests
 
-91 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
+99 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
 the HTTP surface is exercised over a real socket on an ephemeral port.
 
 ```sh
@@ -275,6 +306,8 @@ python -m pytest
 | `tests/test_server.py` | auth fails closed on `/chat`, `/feedback` and `/health/deep`; request/response shapes; logging; no exception text leaks |
 | `tests/test_hooks.py` | the example client's US-state routing |
 | `tests/test_regex_safety.py` | risky crisis patterns rejected at startup, match bounded, detector disabled after a timeout, handler cap holds |
+| `tests/test_crisis_set.py` | the labelled set is well formed and the detector still clears its recall and precision floors |
+| `scripts/eval_crisis.py` | CI gate: measures recall and precision against the labelled set |
 
 CI runs the suite on Python 3.11 and 3.12 (`.github/workflows/tests.yml`).
 
@@ -293,9 +326,11 @@ hooks, JSONL logging, systemd + Caddy deploy, Vercel proxy + React widget.
 
 Not done, in rough priority order:
 
-1. **Crisis recall is unmeasured.** The regexes are hand-written; there is no
-   eval set of real phrasings, so false negatives are unknown. This is the one
-   gap I would not ship to a wide public audience without fixing.
+1. **Crisis recall is measured against a hand-authored set, not real traffic.**
+   0.984 recall and 1.000 precision on `eval/crisis_set.jsonl` (121 rows), gated
+   in CI. The set is written from how parents phrase these things, not harvested
+   from logs, so treat it as a floor that catches regressions rather than a
+   claim about the world. Patterned injury is a known miss.
 2. **No incremental indexing.** Any vault edit means a full rebuild (~5s per
    8k chunks).
 3. **BM25 only.** No embeddings, by design (a 1 GB box with no GPU serves this).

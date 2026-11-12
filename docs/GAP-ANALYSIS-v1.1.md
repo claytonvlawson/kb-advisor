@@ -41,6 +41,14 @@ That list is why the gaps below are worth fixing rather than rewriting.
 
 ### 1. Crisis recall is unmeasured
 
+**Status: measured and gated.** `eval/crisis_set.jsonl` (121 labelled rows: 61
+crisis, 60 ordinary including idioms and near-misses), `scripts/eval_crisis.py`, and
+a CI job that fails below 0.95 recall or 0.90 precision. Baseline on the shipped
+patterns was **recall 0.344, precision 1.000**: 40 of 61 crisis questions would have
+been missed silently. After rewriting the trigger set (14 to 47 patterns):
+**recall 0.984, precision 1.000**. The set is hand-authored rather than harvested
+from traffic, and patterned injury is a documented miss.
+
 `clients/example-parent-advisor/crisis.json` holds 14 hand-written patterns. There
 is no labelled set of real phrasings, so the false-negative rate is unknown, and a
 false negative here is a safety event that fails silently. The README already says
