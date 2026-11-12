@@ -1,0 +1,4 @@
+requests>=2.31
+rank_bm25>=0.2.2
+# PDF ingestion only (ingest/ingest_pdfs.py). The server does not need it.
+pymupdf>=1.24
