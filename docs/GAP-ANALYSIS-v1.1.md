@@ -277,7 +277,10 @@ behind it. Worth stating explicitly, or supporting a per-client token map.
 14. **Observability is `print()`.** No version in `/health`, no request id in the
     process log, no latency, model or fallback counters. The qa log has an id; the
     log line does not.
-15. **Prompt injection via ingested PDFs.** Retrieved chunks are inserted into the
+15. **Prompt injection via ingested PDFs.** *(Addressed in 1.4.0: an ingest scan with a
+    flag/skip mode, a serve-time drop logged to `injection_log.jsonl`, `<source>`-wrapped
+    context plus a fixed data rule. The stated limit is prose-level bad advice, which no
+    scanner catches.)* Retrieved chunks are inserted into the
     prompt with no instruction-stripping or provenance marking. In scope for a
     template whose selling point is "drop in a client's PDFs".
 16. **The index is a pickle.** `pickle.load` on a file means code execution if the

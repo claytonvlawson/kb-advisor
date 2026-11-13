@@ -5,6 +5,34 @@ existing `clients/<name>/` config (a crisis pattern the guard now rejects, a
 retired env var, a changed response field) bumps the minor version, because a
 deployment that upgrades in place is the normal case for a template.
 
+## 1.4.0 (2026-11-12)
+
+**Prompt injection is now a defended surface**, the last P2 that mattered for the
+template's core promise ("drop in a client's PDFs").
+
+- `kb/injection.py`: scans text for instruction-shaped language (overrides,
+  prompt exfiltration, role hijack, secrecy directives, shell commands aimed at
+  a URL, send-to-URL exfiltration, long encoded blobs) and for zero-width and
+  bidi control characters. `sanitize()` strips hidden characters and neutralises
+  `</source>` so a chunk cannot close its own wrapper.
+- Ingest: every PDF's text is scanned. `--on-injection flag` (default) writes the
+  note with an `injection_flags` frontmatter marker and a `> [!warning]` callout;
+  `skip` refuses the file. The CLI reports flagged notes in its summary.
+- Serve time: retrieved chunks are screened again, because the vault can be
+  edited by hand after ingest. Poisoned chunks are dropped from the context and
+  recorded in `injection_log.jsonl` with source and rule names, never the text.
+- Prompt: context is delivered in `<source path="...">` blocks with a fixed rule
+  appended to every persona that text inside those tags is reference material,
+  never instructions.
+- Tests: 190 total. Scanner positives and negatives (including that a document
+  *about* prompt injection is not flagged), sanitizer behaviour, the ingest flag
+  and skip paths, the serve-time drop and its log row, and the wrapper plus rule
+  reaching the messages the model actually receives.
+
+Stated limit, in the README rather than implied: this does not stop a document
+that gives bad advice in ordinary prose. It raises the cost of an attack and
+makes the attempt visible.
+
 ## 1.3.0 (2026-11-12)
 
 The last two P1s from the gap analysis: reproducible installs, and a repo someone

@@ -90,6 +90,16 @@ class TestSkippedFiles:
 
 
 class TestCommandLine:
+    def _src(self, tmp_path, names):
+        """A controlled input dir, so adding a fixture later cannot break this."""
+        import shutil
+
+        src = tmp_path / "pdfs"
+        src.mkdir()
+        for name in names:
+            shutil.copy(fixture(name), src / name)
+        return str(src)
+
     def _run(self, tmp_path, monkeypatch, src):
         out = tmp_path / "vault"
         monkeypatch.setattr(sys, "argv", ["ingest_pdfs.py", src, "-o", str(out)])
@@ -97,7 +107,8 @@ class TestCommandLine:
         return out
 
     def test_writes_one_note_and_skips_the_other_two(self, tmp_path, monkeypatch, capsys):
-        out = self._run(tmp_path, monkeypatch, FIXTURES)
+        src = self._src(tmp_path, ["paper.pdf", "scanned.pdf", "broken.pdf"])
+        out = self._run(tmp_path, monkeypatch, src)
         notes = sorted(p.name for p in out.iterdir())
         assert notes == ["paper.md"], notes
         printed = capsys.readouterr().out
@@ -105,13 +116,30 @@ class TestCommandLine:
         assert "corrupt or truncated" in printed
 
     def test_never_silently_overwrites_an_existing_note(self, tmp_path, monkeypatch):
-        first = self._run(tmp_path, monkeypatch, FIXTURES)
+        src = self._src(tmp_path, ["paper.pdf"])
+        first = self._run(tmp_path, monkeypatch, src)
         second_out = tmp_path / "vault"
-        monkeypatch.setattr(sys, "argv", ["ingest_pdfs.py", FIXTURES, "-o", str(second_out)])
+        monkeypatch.setattr(sys, "argv", ["ingest_pdfs.py", src, "-o", str(second_out)])
         ingest_pdfs.main()
         notes = sorted(p.name for p in second_out.iterdir())
         assert notes == ["paper 2.md", "paper.md"], notes
         assert first.exists()
+
+
+class TestCommandLineFlagsInjection:
+    def test_flagged_note_is_reported_in_the_summary(self, tmp_path, monkeypatch, capsys):
+        import shutil
+
+        src = tmp_path / "pdfs"
+        src.mkdir()
+        shutil.copy(fixture("poisoned.pdf"), src / "poisoned.pdf")
+        out = tmp_path / "vault"
+        monkeypatch.setattr(sys, "argv", ["ingest_pdfs.py", str(src), "-o", str(out)])
+        ingest_pdfs.main()
+        printed = capsys.readouterr().out
+        assert "FLAGGED 1 note(s)" in printed
+        assert "poisoned.md" in printed
+        assert "review the sources" in printed
 
 
 class TestIngestFeedsRetrieval:

@@ -38,7 +38,10 @@ model, so the interesting classes are:
   when `ADVISOR_LOG_QUESTION=redact`, or a log line containing a token.
 - **Prompt injection with impact.** Retrieved text from an ingested PDF that
   makes the model emit a crisis number, a URL, or an instruction that the
-  persona forbids. Report it with the PDF or the text that does it.
+  persona forbids. Report it with the PDF or the text that does it. The
+  defences (ingest scan, serve-time drop, `<source>` wrapping plus a fixed
+  rule) are described under "Prompt injection" in the README; a bypass of any
+  of them is in scope.
 
 ## What is out of scope
 

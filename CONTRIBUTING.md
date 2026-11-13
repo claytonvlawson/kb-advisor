@@ -38,6 +38,9 @@ needs to say which trade it is making:
 7. Never assume the user's location.
 8. BM25 only, no dense half.
 9. Client regexes are validated and every match is bounded.
+10. The knowledge base is data. Context is wrapped in `<source>` tags with a
+    fixed rule, ingested text is scanned and flagged, and retrieved chunks that
+    address the model are dropped and logged.
 
 ## What CI enforces
 

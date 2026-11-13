@@ -31,6 +31,9 @@ import sys
 
 import fitz  # PyMuPDF
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kb"))
+import injection  # noqa: E402  (the scanner lives next to the server that uses it)
+
 MIN_CHARS_PER_PAGE = 80   # below this the page is probably scanned
 
 
@@ -163,7 +166,7 @@ def _guess_authors(doc, title):
     return ""
 
 
-def _pdf_to_note_inner(pdf_path):
+def _pdf_to_note_inner(pdf_path, on_injection="flag"):
     doc = fitz.open(pdf_path)
     meta = doc.metadata or {}
     body_size, heading_threshold = _guess_headings(doc)
@@ -204,7 +207,19 @@ def _pdf_to_note_inner(pdf_path):
     citation = build_citation_text(title, authors, year, doi, url)
     doc.close()
 
+    # A PDF is untrusted input and its text goes in front of the model, so it is
+    # scanned before it becomes a note. `sanitize` always runs: zero-width and
+    # bidi characters have no place in a knowledge base.
+    findings = injection.scan(body)
+    rules = injection.summary(findings)
+    if findings and on_injection == "skip":
+        return None, ("instruction-like content (%s) -- review the file before "
+                      "ingesting it" % rules)
+    body = injection.sanitize(body)
+
     fm_lines = ["---", "name: %s" % title, "type: source"]
+    if findings:
+        fm_lines.append("injection_flags: %d" % len({name for name, _ in findings}))
     if authors:
         fm_lines.append("authors: %s" % authors)
     if year:
@@ -216,13 +231,17 @@ def _pdf_to_note_inner(pdf_path):
     fm_lines.append("---")
 
     note = "\n".join(fm_lines) + "\n\n# %s\n" % title
+    if findings:
+        note += ("\n> [!warning] Instruction-like text was found in this document "
+                 "(%s). Retrieval screens chunks at serve time and will drop them; "
+                 "review the source before trusting this note.\n" % rules)
     if citation:
         note += "\n## Full citation\n\n%s\n" % citation
     note += "\n" + body.strip() + "\n"
     return note, None
 
 
-def pdf_to_note(pdf_path):
+def pdf_to_note(pdf_path, on_injection="flag"):
     """(note, error). MuPDF error output is muted either way.
 
     A corrupt PDF makes the C library spray "format error" lines onto stderr;
@@ -234,7 +253,7 @@ def pdf_to_note(pdf_path):
     if can_mute:
         tools.mupdf_display_errors(False)
     try:
-        return _pdf_to_note_inner(pdf_path)
+        return _pdf_to_note_inner(pdf_path, on_injection=on_injection)
     finally:
         if can_mute:
             tools.mupdf_display_errors(True)
@@ -244,6 +263,10 @@ def main():
     ap = argparse.ArgumentParser(description="PDF -> markdown note(s) for the KB advisor vault")
     ap.add_argument("src", help="PDF file or directory of PDFs")
     ap.add_argument("-o", "--out", required=True, help="vault directory to write notes into")
+    ap.add_argument("--on-injection", choices=("flag", "skip"), default="flag",
+                    help="flag (default): write the note with a warning callout and "
+                         "a frontmatter marker; skip: refuse to write it at all. "
+                         "Either way the serve-time screen drops the chunk.")
     args = ap.parse_args()
 
     if os.path.isfile(args.src):
@@ -260,10 +283,10 @@ def main():
         sys.exit(1)
 
     os.makedirs(args.out, exist_ok=True)
-    written, skipped = [], []
+    written, skipped, flagged = [], [], []
     for p in pdfs:
         try:
-            note, err = pdf_to_note(p)
+            note, err = pdf_to_note(p, on_injection=args.on_injection)
         except Exception as exc:
             note, err = None, "extraction failed: %s" % exc
         if err:
@@ -276,14 +299,20 @@ def main():
         while os.path.exists(out_path):     # never silently overwrite a note
             out_path = os.path.join(args.out, "%s %d.md" % (stem, i))
             i += 1
+        if "> [!warning] Instruction-like text" in note:
+            flagged.append(out_path)
         with open(out_path, "w", encoding="utf-8") as fh:
             fh.write(note)
         written.append(out_path)
         print("OK    %s -> %s" % (os.path.basename(p), os.path.relpath(out_path)))
 
     print("\nWrote %d note(s), skipped %d." % (len(written), len(skipped)))
+    if flagged:
+        print("FLAGGED %d note(s) for instruction-like content: %s"
+              % (len(flagged), ", ".join(os.path.basename(f) for f in flagged)))
+        print("  Retrieval screens these chunks at serve time; review the sources.")
     if skipped:
-        print("Skipped files need OCR (scanned) or manual review.")
+        print("Skipped files need OCR (scanned), a re-download (corrupt), or review.")
     print("Next: rebuild the index (see README) and restart the server.")
 
 

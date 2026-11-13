@@ -67,6 +67,7 @@ def kb(index_path, tmp_path_factory):
     kb_server.QA_LOG = os.path.join(str(log_dir), "qa_log.jsonl")
     kb_server.FEEDBACK_LOG = os.path.join(str(log_dir), "feedback.jsonl")
     kb_server.CRISIS_LOG = os.path.join(str(log_dir), "crisis_log.jsonl")
+    kb_server.INJECTION_LOG = os.path.join(str(log_dir), "injection_log.jsonl")
     return kb_server
 
 
