@@ -1,19 +1,65 @@
 [Unit]
 Description=KB Advisor (BM25 + OpenRouter, per-client persona)
+Documentation=https://github.com/claytonvlawson/kb-advisor
 After=network-online.target
 Wants=network-online.target
+# Do not restart forever on a config that will never boot (a risky crisis
+# regex, a missing index): five tries in five minutes, then stay down so the
+# failure is visible instead of flapping.
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
-Type=simple
+Type=exec
 User=kb-advisor
+Group=kb-advisor
 WorkingDirectory=/opt/kb-advisor
 EnvironmentFile=/etc/kb-advisor.env
-# ADVISOR_CLIENT set in the env file points at the deployed client config
+# ADVISOR_CLIENT set in the env file points at the deployed client config.
+
 ExecStart=/usr/bin/python3 /opt/kb-advisor/kb/kb_server.py
-Restart=on-failure
+# Readiness gate: systemd has no notify support in this app, so the unit is only
+# "started" once /health answers. A boot that cannot load the index fails here
+# rather than serving 502s.
+ExecStartPost=/opt/kb-advisor/deploy/wait_for_health.sh
+
+# A clean exit is still a failure: the process should only leave on a signal.
+Restart=always
 RestartSec=3
+
 NoNewPrivileges=true
 PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+SystemCallArchitectures=native
+UMask=0077
+
+# The only writable paths. This MUST match ADVISOR_LOG_DIR (and any other path
+# the deployment writes); a mismatch shows up as silently dropped log rows.
+ReadWritePaths=/var/lib/kb-advisor
+
+# Sized for the 1 GB box the README deploys to: service RSS with a ~8k-chunk
+# BM25 index sits near 300 MB, and a runaway generation should kill the unit
+# rather than the VM. Scale these if you index a much larger vault.
+MemoryAccounting=true
+MemoryHigh=600M
+MemoryMax=800M
+
+# Matches ADVISOR_MAX_THREADS (8) with headroom for the health check and any
+# in-flight keep-alive connections. systemd's default of 4096 threads on a 1 GB
+# box is not a budget, it is a promise the kernel cannot keep.
+TasksMax=64
+LimitNOFILE=4096
 
 [Install]
 WantedBy=multi-user.target

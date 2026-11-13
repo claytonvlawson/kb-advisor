@@ -361,7 +361,30 @@ rsync -az --exclude .git --exclude 'clients/*/index' --exclude 'clients/*/logs' 
 Then on the VM: `pip install rank_bm25 requests pymupdf` (ingest runs on your
 machine, not the VM), copy `deploy/kb.env.example` to `/etc/kb-advisor.env`,
 fill in `ADVISOR_TOKEN`, `OPENROUTER_API_KEY`, and `ADVISOR_CLIENT`, install
-`deploy/kb-advisor.service`, and put Caddy in front (see `deploy/Caddyfile`).
+`deploy/kb-advisor.service` and `deploy/wait_for_health.sh`, and put Caddy in
+front (see `deploy/Caddyfile`).
+
+The unit is written for the 1 GB box this section describes, not for a laptop:
+
+- `ProtectSystem=strict` with `ReadWritePaths=/var/lib/kb-advisor`, `ProtectHome`,
+  `PrivateDevices`, `RestrictNamespaces`, `SystemCallArchitectures=native`, and
+  `UMask=0077`. **`ReadWritePaths` must contain `ADVISOR_LOG_DIR`**, or the
+  service starts and silently drops every log row.
+- `MemoryMax=800M` / `MemoryHigh=600M`: a runaway generation kills the unit, not
+  the VM. Resize against your own index (service RSS with 8k chunks sits near
+  300 MB).
+- `Restart=always`, so a clean exit is treated as a failure, with
+  `StartLimitBurst=5` so a config that can never boot stays down and visible
+  instead of flapping.
+- `TasksMax=64` matched to `ADVISOR_MAX_THREADS`, because systemd's 4096-thread
+  default is not a budget a 1 GB box can honour.
+- `ExecStartPost=deploy/wait_for_health.sh` is the readiness gate: the unit is
+  only "started" once `/health` answers, so a missing index fails the start
+  instead of serving 502s.
+
+Check it on the host with `systemd-analyze verify deploy/kb-advisor.service`
+before restarting. `tests/test_deploy.py` asserts the hardening is still in the
+file and that the unit and the app agree on the log path.
 
 Index load takes ~5s; poll `/health` after restart rather than curling once.
 Set the environment file chmod 600. Put the front end's bearer token in the
@@ -369,7 +392,7 @@ edge function (Vercel/Netlify), never in the browser.
 
 ## Tests
 
-131 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
+147 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
 the HTTP surface is exercised over a real socket on an ephemeral port.
 
 ```sh
@@ -389,6 +412,7 @@ python -m pytest
 | `tests/test_regex_safety.py` | risky crisis patterns rejected at startup, match bounded, detector disabled after a timeout, handler cap holds |
 | `tests/test_crisis_set.py` | the labelled set is well formed and the detector still clears its recall and precision floors |
 | `tests/test_logs.py` | redaction modes, rotation bounds, age-based pruning, and a live `/feedback` write whose note is scrubbed |
+| `tests/test_deploy.py` | unit hardening, Caddy body cap and forwarded-header handling, env documentation, and version/changelog/CI-floor agreement |
 | `tests/test_ratelimit.py` | bucket refill and deny, bounded identity tracking, generation shedding, `429`/`503` shapes, and that a spoofed `X-Forwarded-For` buys nothing |
 | `scripts/eval_crisis.py` | CI gate: measures recall and precision against the labelled set |
 
