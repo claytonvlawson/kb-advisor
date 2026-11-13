@@ -1,6 +1,6 @@
 [project]
 name = "kb-advisor"
-version = "1.1.0"
+version = "1.1.1"
 description = "Template RAG advisor: drop in client PDFs, get a cited, safety-routed knowledge-base API"
 requires-python = ">=3.10"
 dependencies = ["requests>=2.31", "rank_bm25>=0.2.2"]
@@ -8,6 +8,48 @@ dependencies = ["requests>=2.31", "rank_bm25>=0.2.2"]
 [project.optional-dependencies]
 ingest = ["pymupdf>=1.24"]
 test = ["pytest>=8.0"]
+
+# Lint gate. The rule set is deliberately bug-focused: E4/E7/E9 and F catch
+# real breakage, B catches likely bugs. Formatting rules (UP031's %-formatting
+# rewrite, line length) are left out on purpose, because a template full of
+# churn teaches reviewers to ignore the diff.
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "W", "F", "B", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert on literals and use long, descriptive names.
+"tests/*" = ["E501"]
+
+# Types: kb/ is checked; the rest is scripts and tests, which are exercised by
+# running them. Untyped defs are allowed (no stubs in this repo yet), but a
+# wrong annotation is still an error.
+[tool.mypy]
+python_version = "3.10"
+files = ["kb"]
+ignore_missing_imports = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+module = ["requests", "rank_bm25", "fitz"]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["kb"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+# Today's number is 77% (branch coverage over kb/). The floor sits below it so a
+# refactor does not fail on noise, and above it would just be a lie. Raise it as
+# the suite grows.
+fail_under = 75
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

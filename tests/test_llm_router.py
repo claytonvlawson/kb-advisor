@@ -5,9 +5,8 @@ The behaviours worth locking down are the ones that decide whether a user gets
 an answer at all: fall through to the paid tier on 429/5xx, do not fall
 through on success, and report a machine-readable error when both tiers die.
 """
-import pytest
-
 import llm_router
+import pytest
 
 
 class FakeResponse:

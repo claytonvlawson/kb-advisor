@@ -184,6 +184,14 @@ matrix updated to match.
 
 ### 7. No static checks or coverage gate
 
+**Status: ruff, mypy and a coverage floor, in a `quality` CI job.** Ruff runs
+`E4/E7/E9/W/F/B/I` (bug-focused; no line-length or `%`-formatting rules, which would
+be churn); mypy covers `kb/` with per-module ignores for `requests`, `rank_bm25` and
+`fitz`; `pytest --cov` enforces `fail_under = 75` against a measured 77% branch
+coverage. Adding them fixed 13 real findings: 3 unused imports, 2 `raise` statements
+missing `from`, 6 ambiguous `l` names, and an unannotated module-level dict. Local and
+CI read the same config, so the numbers cannot drift.
+
 CI runs pytest and nothing else. There is no ruff, no mypy, no coverage floor.
 For a repo whose stated purpose is to be copied per client, a lint and type gate is
 the cheapest way to keep forks from rotting.

@@ -239,7 +239,7 @@ print("Client config: %s" % CLIENT_DIR, flush=True)
 print("Logging exchanges to %s" % QA_LOG, flush=True)
 
 _log_lock = threading.Lock()
-_LOG_OBJECTS = {}
+_LOG_OBJECTS: dict[str, logio.JsonlLog] = {}
 
 
 def _log_for(path):

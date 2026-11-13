@@ -6,7 +6,6 @@ proxy. Every route that spends money or writes data is tested both ways.
 """
 import http.client
 import json
-import os
 
 
 def request(server, method, path, body=None, token=None, raw=None):

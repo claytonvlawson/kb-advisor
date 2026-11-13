@@ -84,7 +84,7 @@ def _extract_full_citation(body):
             continue
         if capturing:
             out.append(line)
-    text = _clean_md(" ".join(l.strip() for l in out if l.strip()))
+    text = _clean_md(" ".join(line.strip() for line in out if line.strip()))
     return re.sub(r"\s+", " ", text).strip()
 
 
@@ -102,7 +102,7 @@ def _extract_callout_citation(body):
             out.append(re.sub(r"^\s*>\s?", "", line))
         else:
             break
-    text = _clean_md(" ".join(l.strip() for l in out if l.strip()))
+    text = _clean_md(" ".join(line.strip() for line in out if line.strip()))
     return re.sub(r"\s+", " ", text).strip()
 
 

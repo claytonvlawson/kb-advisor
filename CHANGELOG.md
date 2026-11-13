@@ -5,6 +5,18 @@ existing `clients/<name>/` config (a crisis pattern the guard now rejects, a
 retired env var, a changed response field) bumps the minor version, because a
 deployment that upgrades in place is the normal case for a template.
 
+## 1.1.1 (2026-11-12)
+
+Developer tooling only: no behaviour change for a deployment.
+
+- Ruff (`E4/E7/E9/W/F/B/I`, deliberately no line-length or `%`-formatting rules)
+  and mypy over `kb/` in a `quality` CI job, plus `pytest --cov` with a 75%
+  branch-coverage floor (measured 77%). Local and CI read the same pyproject
+  config, so the numbers cannot drift.
+- Fixed while adding the gates: three unused imports, two `raise` statements
+  missing `from` (B904), six ambiguous `l` names, and one unannotated
+  module-level dict.
+
 ## 1.1.0 (2026-11-12)
 
 The release that closes every P0 from the [gap analysis](docs/GAP-ANALYSIS-v1.1.md).

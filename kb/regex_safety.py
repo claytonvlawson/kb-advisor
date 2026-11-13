@@ -211,7 +211,8 @@ def compile_patterns(patterns, client="<client>"):
     try:
         return re.compile("|".join(patterns), re.IGNORECASE)
     except re.error as exc:
-        raise RiskyPatternError("|".join(patterns), "does not compile: %s" % exc)
+        raise RiskyPatternError("|".join(patterns),
+                                "does not compile: %s" % exc) from exc
 
 
 _disabled = False

@@ -69,7 +69,7 @@ def main(argv=None):
     try:
         regex = regex_safety.compile_patterns(patterns, client=str(crisis_path))
     except regex_safety.RiskyPatternError as exc:
-        raise SystemExit("pattern guard rejected the config: %s" % exc)
+        raise SystemExit("pattern guard rejected the config: %s" % exc) from exc
 
     rows = load_set(a.set)
     if not rows:

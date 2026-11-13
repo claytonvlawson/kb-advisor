@@ -174,7 +174,7 @@ class TestCrisisReviewExport:
         rc = mod.main(["--log", log, "--out", str(out),
                        "--consent", "test", "--existing", str(tmp_path / "none.jsonl")])
         assert rc == 0
-        rows = [json.loads(l) for l in out.read_text().splitlines()]
+        rows = [json.loads(line) for line in out.read_text().splitlines()]
         texts = [r["text"] for r in rows]
         assert len(rows) == 2, texts          # duplicate and short row dropped
         assert all(r["label"] == "" for r in rows), "the script must not label"

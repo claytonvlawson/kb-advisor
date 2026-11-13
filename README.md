@@ -401,8 +401,16 @@ the HTTP surface is exercised over a real socket on an ephemeral port.
 ```sh
 python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements-dev.txt
-python -m pytest
+python -m pytest --cov            # 157 tests, coverage floor from pyproject
+ruff check kb ingest scripts tests
+mypy                              # kb/ only, configured in pyproject
 ```
+
+CI runs the suite on 3.10, 3.11 and 3.12 with a **75% branch-coverage floor**
+(currently 77% over `kb/`), ruff on `E4/E7/E9/W/F/B/I`, and mypy over `kb/`. The
+lint set is deliberately bug-focused: no line-length or `%`-formatting churn,
+because a template that rewrites 100 format strings teaches reviewers to ignore
+the diff. Untyped defs are allowed; a wrong annotation is not.
 
 | File | What it pins down |
 |---|---|

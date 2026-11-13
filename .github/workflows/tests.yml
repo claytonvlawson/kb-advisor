@@ -25,7 +25,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       - name: Run the test suite
-        run: python -m pytest --color=yes
+        # Coverage floor comes from pyproject ([tool.coverage.report],
+        # fail_under), so local and CI enforce the same number.
+        run: python -m pytest --color=yes --cov --cov-report=term-missing
+
+  quality:
+    # Static gates. Kept in their own job so a lint failure is one glance away
+    # instead of buried in a test matrix.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Ruff
+        run: ruff check kb ingest scripts tests
+      - name: Mypy
+        run: mypy
 
   crisis-eval:
     # The safety path is the one part where an unmeasured regression is silent,

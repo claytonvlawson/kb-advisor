@@ -7,7 +7,6 @@ retrieval/citation code. Modeled on jetson-brain's langchain_agent.py cloud
 tier (same rate-limit detection idea), but stdlib `requests` only.
 """
 import os
-import time
 
 import requests
 

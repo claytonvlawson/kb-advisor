@@ -8,7 +8,6 @@ tested against real parent phrasing rather than keyword lists.
 """
 import pytest
 
-
 CRISIS_TRIGGERS = [
     "I'm scared, he wishes he had never been born",
     "my kid is talking about self harm tonight",

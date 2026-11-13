@@ -10,7 +10,6 @@ The second two must be reported and skipped, never fabricated into a note. The
 distinction between them matters: a truncated file used to be reported as "needs
 OCR", which sends the reader down a path that cannot work.
 """
-import json
 import os
 import sys
 
@@ -59,9 +58,10 @@ class TestTextPDF:
     def test_promotes_larger_text_to_headings(self):
         """The chunker is heading-aware; a flat page produces one giant chunk."""
         note, _ = ingest_pdfs.pdf_to_note(fixture("paper.pdf"))
-        heading_lines = [l for l in note.splitlines() if l.startswith("#")]
-        assert any("Methods" in l for l in heading_lines), heading_lines
-        assert not any(l.strip().startswith("## Methods and the title") for l in heading_lines)
+        heading_lines = [line for line in note.splitlines() if line.startswith("#")]
+        assert any("Methods" in line for line in heading_lines), heading_lines
+        assert not any(line.strip().startswith("## Methods and the title")
+                        for line in heading_lines)
 
     def test_body_text_survives(self):
         note, _ = ingest_pdfs.pdf_to_note(fixture("paper.pdf"))
