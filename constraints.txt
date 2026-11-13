@@ -1,0 +1,22 @@
+# Exact versions the supported deployment was tested with.
+#
+# Generate with a clean install of requirements.txt, then pip freeze:
+#   python3 -m venv /tmp/pin && /tmp/pin/bin/pip install -q -r requirements.txt
+#   /tmp/pin/bin/pip freeze
+#
+# Used by CI (`pip install -r requirements-dev.txt -c constraints.txt`) and by
+# deploy, so "works on my machine" has a concrete meaning. Dev tools (ruff,
+# mypy, pytest) are intentionally not pinned here: they gate code, they do not
+# run in production.
+#
+# Refresh this file deliberately, in its own commit, with the test suite and the
+# crisis eval green either side of it. That diff is the answer when someone asks
+# what changed in production.
+certifi==2026.10.23
+charset-normalizer==3.5.2
+idna==3.20
+numpy==2.0.2
+PyMuPDF==1.26.5
+rank-bm25==0.2.2
+requests==2.32.5
+urllib3==2.6.3

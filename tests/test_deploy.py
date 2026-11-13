@@ -179,6 +179,62 @@ class TestVersioning:
             "pyproject claims >=%s but CI runs %s" % (floor, tested.strip()))
 
 
+class TestPinning:
+    """The reproducibility claim is only as good as the pins behind it."""
+
+    def test_constraints_pins_every_runtime_dependency(self):
+        import re
+        runtime = open(os.path.join(ROOT, "requirements.txt")).read()
+        # names declared in requirements.txt, ignoring comments and extras
+        names = set()
+        for line in runtime.splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            names.add(re.split(r"[<>=!\[]", line)[0].lower().replace("_", "-"))
+        constraints = open(os.path.join(ROOT, "constraints.txt")).read()
+        pinned = {}
+        for line in constraints.splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            name, _, version = line.partition("==")
+            pinned[name.lower().replace("_", "-")] = version
+        missing = names - set(pinned)
+        assert not missing, "unpinned runtime dependencies: %s" % sorted(missing)
+        for name, version in pinned.items():
+            assert version and not version.startswith("<"), (
+                "%s must be pinned to an exact version" % name)
+
+    def test_ci_installs_against_the_constraints(self):
+        workflow = open(os.path.join(ROOT, ".github", "workflows", "tests.yml")).read()
+        assert "-c constraints.txt" in workflow, (
+            "CI does not install with constraints.txt, so the pins are decorative")
+
+    def test_ingest_extra_is_pinned_too(self):
+        constraints = open(os.path.join(ROOT, "constraints.txt")).read().lower()
+        assert "pymupdf==" in constraints, "the ingest dependency is not pinned"
+
+
+class TestCommunityFiles:
+    def test_security_policy_names_a_private_channel(self):
+        text = open(os.path.join(ROOT, "SECURITY.md")).read()
+        assert "private vulnerability reporting" in text.lower()
+        assert "Do not open a public issue" in text
+
+    def test_security_policy_is_specific_about_this_system(self):
+        text = open(os.path.join(ROOT, "SECURITY.md")).read().lower()
+        for topic in ("auth bypass", "crisis", "denial of service",
+                      "cross-client", "logs"):
+            assert topic in text, "SECURITY.md says nothing about %s" % topic
+
+    def test_contributing_states_the_gates_and_the_invariants(self):
+        text = open(os.path.join(ROOT, "CONTRIBUTING.md")).read()
+        assert "crisis-eval" in text and "quality" in text
+        assert "eval/crisis_set.jsonl" in text
+        assert "one process per client" in text.lower()
+
+
 class TestEnvExample:
     def test_every_setting_module_reads_is_documented(self):
         """A knob nobody can find is a knob that gets left at the default."""

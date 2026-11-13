@@ -361,8 +361,8 @@ rsync -az --exclude .git --exclude 'clients/*/index' --exclude 'clients/*/logs' 
   ./ vm:/opt/kb-advisor/
 ```
 
-Then on the VM: `pip install rank_bm25 requests pymupdf` (ingest runs on your
-machine, not the VM), copy `deploy/kb.env.example` to `/etc/kb-advisor.env`,
+Then on the VM: `pip install rank_bm25 requests pymupdf -c constraints.txt`
+(ingest runs on your machine, not the VM), copy `deploy/kb.env.example` to `/etc/kb-advisor.env`,
 fill in `ADVISOR_TOKEN`, `OPENROUTER_API_KEY`, and `ADVISOR_CLIENT`, install
 `deploy/kb-advisor.service` and `deploy/wait_for_health.sh`, and put Caddy in
 front (see `deploy/Caddyfile`).
@@ -429,15 +429,26 @@ Index load takes ~5s; poll `/health` after restart rather than curling once.
 Set the environment file chmod 600. Put the front end's bearer token in the
 edge function (Vercel/Netlify), never in the browser.
 
+## Reproducibility
+
+`constraints.txt` pins the exact versions the supported deployment was tested
+with. CI installs with `-c constraints.txt`, so the pins are exercised on every
+push rather than being decorative, and a test fails if a runtime dependency in
+`requirements.txt` is not pinned.
+
+Refresh it deliberately, in its own commit, with the suite and the crisis eval
+green either side: that diff is the answer when someone asks what changed in
+production.
+
 ## Tests
 
-157 tests, offline, no model calls, about 4 seconds. `requests.post` is faked and
+168 tests, offline, no model calls, about 4 seconds. `requests.post` is faked and
 the HTTP surface is exercised over a real socket on an ephemeral port.
 
 ```sh
 python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements-dev.txt
-python -m pytest --cov            # 162 tests, coverage floor from pyproject
+python -m pytest --cov            # 168 tests, coverage floor from pyproject
 ruff check kb ingest scripts tests
 mypy                              # kb/ only, configured in pyproject
 ```
@@ -518,6 +529,13 @@ crisis regexes, location routing) were lifted out into the per-client config
 directory you see under `clients/`. The chunker and tokenizer are kept
 byte-identical to the originals on purpose: an index built by one copy has to be
 searchable by the other.
+
+## Contributing and security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for adding a client, the invariants, and
+what CI enforces. Report vulnerabilities through GitHub's private vulnerability
+reporting, not a public issue; [SECURITY.md](SECURITY.md) lists what counts as a
+vulnerability here and what is out of scope.
 
 ## License
 

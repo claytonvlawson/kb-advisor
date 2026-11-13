@@ -5,6 +5,28 @@ existing `clients/<name>/` config (a crisis pattern the guard now rejects, a
 retired env var, a changed response field) bumps the minor version, because a
 deployment that upgrades in place is the normal case for a template.
 
+## 1.3.0 (2026-11-12)
+
+The last two P1s from the gap analysis: reproducible installs, and a repo someone
+can contribute to and report a vulnerability against.
+
+- `constraints.txt` pins every runtime dependency to an exact version, and all
+  three CI jobs install with `-c constraints.txt`, so the pins are exercised
+  rather than decorative. A test fails if a runtime dependency in
+  `requirements.txt` is not pinned, or if CI stops installing against the file.
+  (The Python floor half of #6 landed in 1.1.0: 3.10, tested on 3.10 to 3.12.)
+- `SECURITY.md`: private vulnerability reporting via GitHub advisories (now
+  enabled on the repo), what counts as a vulnerability in this system (auth
+  bypass, crisis-path failure, DoS, cross-client exposure, log exposure, prompt
+  injection with impact), what is out of scope, and how to rotate a leaked token
+  on one instance.
+- `CONTRIBUTING.md`: adding a client, the nine invariants, what each CI gate
+  requires, how to change the crisis trigger (labelled example or it does not
+  land), the API compatibility rule, and the release/versioning rules.
+- Tests: constraints completeness and CI wiring, plus assertions that the
+  security policy names a private channel and covers the real attack surface,
+  and that CONTRIBUTING states the gates and the topology.
+
 ## 1.2.0 (2026-11-12)
 
 **Multi-client is now a documented, supported topology.**

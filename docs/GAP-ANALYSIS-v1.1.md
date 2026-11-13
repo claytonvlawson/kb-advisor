@@ -173,6 +173,12 @@ stops there. Missing, on a box the README calls out as 1 GB:
 
 ### 6. Reproducibility
 
+**Status: pinned and enforced.** `constraints.txt` names the exact versions the
+deployment was tested with, every CI job installs with `-c constraints.txt`, and a test
+fails if a runtime dependency is unpinned or if CI stops using the file. The Python
+floor is 3.10 and CI runs 3.10, 3.11 and 3.12; a test fails if `requires-python` is not
+among the tested versions (that check is what caught the original >=3.9 claim).
+
 `requirements.txt` and `pyproject.toml` use `>=` ranges with no lock or constraints
 file, so two installs a month apart can differ. `requires-python = ">=3.9"` while
 CI tests only 3.11 and 3.12; the suite does pass on 3.9 (checked here), so this is
@@ -225,6 +231,14 @@ fork starts from `main`.
 with an entry per tag, and a rule that config-incompatible changes bump the minor.
 
 ### 10. No security or contribution policy
+
+**Status: both added, and the disclosure channel actually works.** `SECURITY.md` points
+at GitHub private vulnerability reporting (enabled on the repository), lists what counts
+as a vulnerability here (auth bypass, crisis-path failure, DoS, cross-client exposure,
+log exposure, prompt injection with impact), states what is out of scope, and gives the
+one-instance token rotation procedure. `CONTRIBUTING.md` covers adding a client, the
+nine invariants, what each CI gate enforces, the rule that a crisis pattern needs a
+labelled example before it lands, API compatibility, and release rules.
 
 No `SECURITY.md`, `CONTRIBUTING.md`, or issue templates. Anyone who finds a hole
 (auth bypass, injection, ReDoS) has no disclosed channel.

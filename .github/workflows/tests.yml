@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          pip install -r requirements-dev.txt -c constraints.txt
       - name: Run the test suite
         # Coverage floor comes from pyproject ([tool.coverage.report],
         # fail_under), so local and CI enforce the same number.
@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          pip install -r requirements-dev.txt -c constraints.txt
       - name: Ruff
         run: ruff check kb ingest scripts tests
       - name: Mypy
@@ -61,6 +61,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          pip install -r requirements-dev.txt -c constraints.txt
       - name: Measure the crisis detector
         run: python scripts/eval_crisis.py --min-recall 0.95 --min-precision 0.90
