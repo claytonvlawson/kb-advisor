@@ -42,8 +42,18 @@ The release that closes every P0 from the [gap analysis](docs/GAP-ANALYSIS-v1.1.
   spoofed.
 
 **Tests**
-- 66 to 147 tests: crisis set, regex guard, logs, rate limiting, and deploy config
-  assertions.
+- 66 to 157 tests: crisis set, regex guard, logs, rate limiting, deploy config
+  assertions, and PDF ingestion.
+
+**Ingestion**
+- Fixtures and tests for the one component that parses untrusted files: a text
+  PDF becomes the expected note, an image-only page and a truncated file are
+  skipped with *distinct* reasons, notes are never overwritten, and the written
+  note indexes cleanly through the chunker.
+- Fixed while writing them: a truncated PDF does not raise, MuPDF repairs it into
+  a text-free document, and it used to be reported as "needs OCR". It now says
+  the file is corrupt or truncated and that OCR will not help. MuPDF's stderr
+  spray is muted for the duration of the parse and restored in a finally block.
 - Python floor raised to 3.10 and CI now tests it. `requires-python` claimed 3.9
   while the matrix only ran 3.11 and 3.12, so the floor was a claim nothing
   verified; a test now fails if the two disagree.

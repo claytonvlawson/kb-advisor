@@ -190,6 +190,14 @@ the cheapest way to keep forks from rotting.
 
 ### 8. The PDF ingestion path is untested
 
+**Status: tested, and the tests found a real bug.** `tests/test_ingest.py` (10 tests) with
+three committed fixtures: a text PDF with metadata and a DOI, an image-only page, and a
+truncated download. Covered: frontmatter contract, `## Full citation`, heading promotion,
+skip-with-reason for both bad files, no silent overwrite, and an end-to-end check that the
+written note chunks and indexes through `retrieval`. While writing them: a truncated PDF
+never raised, because MuPDF "repairs" it into a text-free document, so it was reported as
+"needs OCR". It now reports corrupt-or-truncated and says OCR will not help.
+
 `ingest/ingest_pdfs.py` is the only component that parses untrusted third-party
 files, and it has no test file at all; the README's test map does not mention it.
 It does skip failures rather than fabricate text, which is the right behaviour and

@@ -344,7 +344,10 @@ a regex is the wrong detector for it.
   heading-aware
 
 Scanned/image-only PDFs are reported and skipped, not fabricated. OCR them
-separately, save the text as markdown, then rebuild.
+separately, save the text as markdown, then rebuild. A truncated or corrupt PDF
+is reported as exactly that, not as "needs OCR": MuPDF silently repairs a bad
+download into a document with no text, so the two cases are told apart before
+the message is written.
 
 The note format targets the stack's conventions, but any markdown works:
 Obsidian exports, your own notes, AI-drafted summaries. Rebuild the index
@@ -392,7 +395,7 @@ edge function (Vercel/Netlify), never in the browser.
 
 ## Tests
 
-147 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
+157 tests, offline, no model calls, about 4 seconds. `requests.post` is faked and
 the HTTP surface is exercised over a real socket on an ephemeral port.
 
 ```sh
@@ -412,6 +415,7 @@ python -m pytest
 | `tests/test_regex_safety.py` | risky crisis patterns rejected at startup, match bounded, detector disabled after a timeout, handler cap holds |
 | `tests/test_crisis_set.py` | the labelled set is well formed and the detector still clears its recall and precision floors |
 | `tests/test_logs.py` | redaction modes, rotation bounds, age-based pruning, and a live `/feedback` write whose note is scrubbed |
+| `tests/test_ingest.py` | a text PDF becomes the expected note, an image-only page and a truncated file are skipped with distinct reasons, notes are never overwritten, and the note indexes cleanly |
 | `tests/test_deploy.py` | unit hardening, Caddy body cap and forwarded-header handling, env documentation, and version/changelog/CI-floor agreement |
 | `tests/test_ratelimit.py` | bucket refill and deny, bounded identity tracking, generation shedding, `429`/`503` shapes, and that a spoofed `X-Forwarded-For` buys nothing |
 | `scripts/eval_crisis.py` | CI gate: measures recall and precision against the labelled set |

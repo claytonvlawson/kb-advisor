@@ -163,7 +163,7 @@ def _guess_authors(doc, title):
     return ""
 
 
-def pdf_to_note(pdf_path):
+def _pdf_to_note_inner(pdf_path):
     doc = fitz.open(pdf_path)
     meta = doc.metadata or {}
     body_size, heading_threshold = _guess_headings(doc)
@@ -171,7 +171,14 @@ def pdf_to_note(pdf_path):
 
     n_pages = max(1, doc.page_count)
     if len(body.strip()) < MIN_CHARS_PER_PAGE * n_pages * 0.5:
+        # A truncated download does not raise: MuPDF "repairs" it into a
+        # document with no text, which used to be reported as "needs OCR" and
+        # sent the reader down the wrong path. Tell the two apart.
+        repaired = bool(getattr(doc, "is_repaired", False))
         doc.close()
+        if repaired:
+            return None, ("corrupt or truncated PDF (the parser had to repair "
+                          "it) -- re-download it; OCR will not help")
         return None, "no text layer (likely scanned) -- needs OCR first"
 
     title = (meta.get("title") or "").strip() or _guess_title(doc, body_size, heading_threshold)
@@ -213,6 +220,24 @@ def pdf_to_note(pdf_path):
         note += "\n## Full citation\n\n%s\n" % citation
     note += "\n" + body.strip() + "\n"
     return note, None
+
+
+def pdf_to_note(pdf_path):
+    """(note, error). MuPDF error output is muted either way.
+
+    A corrupt PDF makes the C library spray "format error" lines onto stderr;
+    our own message is the actionable one, so the noise goes away and comes back
+    in a finally block so one bad file cannot silence the next good one.
+    """
+    tools = getattr(fitz, "TOOLS", None)
+    can_mute = tools is not None and hasattr(tools, "mupdf_display_errors")
+    if can_mute:
+        tools.mupdf_display_errors(False)
+    try:
+        return _pdf_to_note_inner(pdf_path)
+    finally:
+        if can_mute:
+            tools.mupdf_display_errors(True)
 
 
 def main():
