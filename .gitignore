@@ -9,3 +9,8 @@ kb.env
 .env
 .DS_Store
 .pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.ruff_cache/
+.mypy_cache/
