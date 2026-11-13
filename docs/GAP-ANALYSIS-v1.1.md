@@ -102,6 +102,17 @@ That is a self-inflicted denial of service from one bad line of client config.
 
 ### 3. Nothing server-side bounds spend
 
+**Status: bounded in the server and at the edge.** `kb/ratelimit.py` adds a per-client
+token bucket (`ADVISOR_RATE_PER_MIN`, 30, `429` with `Retry-After`) and a generation
+gate (`ADVISOR_MAX_GENERATIONS`, 2, `503` after a bounded wait). Identity comes from
+`X-Forwarded-For` only with `ADVISOR_TRUST_PROXY=1`, and the Caddyfile now replaces
+rather than appends that header, so a spoofed header cannot mint a fresh bucket. Auth
+is still checked first, so exhausting a bucket is not a way around the token. The
+bucket map is bounded and pruned, because one key per identity would otherwise be a
+memory attack. Caddyfile also caps bodies at 16 KB, sets HSTS and baseline headers,
+logs with rotation, and documents the optional `caddy-ratelimit` plugin block.
+Measured live at 3/min: three requests served, fourth `429` with `Retry-After: 20`.
+
 `/chat` calls a paid model. Rate limiting exists only in `frontend/api/chat.js`,
 which stores hits in a module-level `Map`: it resets on every cold start, is not
 shared across instances, and does not apply at all to anything that talks to the

@@ -57,6 +57,10 @@ def kb(index_path, tmp_path_factory):
         "ADVISOR_ALLOW_ANON": "0",
         "ADVISOR_LOG_DIR": str(log_dir),
         "OPENROUTER_API_KEY": "",
+        # Keep the spend controls out of the way here; test_ratelimit.py sets
+        # them per test.
+        "ADVISOR_RATE_PER_MIN": "1000",
+        "ADVISOR_MAX_GENERATIONS": "8",
     })
     import kb_server
     kb_server.LOG_DIR = str(log_dir)

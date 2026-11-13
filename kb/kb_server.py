@@ -52,6 +52,11 @@ Env (per deployment):
                       in the listen backlog rather than becoming threads
   ADVISOR_REGEX_TIMEOUT_S wall clock bound on one crisis match (default 0.25);
                       a timeout disables the detector for the process, loudly
+  ADVISOR_RATE_PER_MIN token bucket per client (default 30); 0 disables
+  ADVISOR_TRUST_PROXY =1 to take the client identity from X-Forwarded-For,
+                      only correct behind a proxy that overwrites it
+  ADVISOR_MAX_GENERATIONS concurrent generations (default 2); over the cap a
+                      request waits ADVISOR_GEN_WAIT_S then gets 503
   OPENROUTER_*        see kb/llm_router.py
 
 Run:
@@ -76,6 +81,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import citations
 import llm_router
 import logio
+import ratelimit
 import regex_safety
 import retrieval
 
@@ -112,6 +118,15 @@ CLIENT_DIR = os.path.abspath(os.environ.get("ADVISOR_CLIENT", "clients/default")
 VAULT_ROOT = os.path.abspath(os.environ.get("ADVISOR_VAULT", os.path.join(CLIENT_DIR, "vault")))
 INDEX_PATH = os.environ.get("ADVISOR_INDEX", os.path.join(CLIENT_DIR, "index", "bm25.pkl"))
 MAX_CITATIONS = int(os.environ.get("ADVISOR_MAX_CITATIONS", "6"))
+
+# Spend and pressure controls. /chat costs money and every in-flight generation
+# holds prompt buffers, so both are bounded here rather than at the edge only.
+RATE_PER_MIN = float(os.environ.get("ADVISOR_RATE_PER_MIN", "30"))
+TRUST_PROXY = os.environ.get("ADVISOR_TRUST_PROXY") == "1"
+MAX_GENERATIONS = int(os.environ.get("ADVISOR_MAX_GENERATIONS", "2"))
+GEN_WAIT_S = float(os.environ.get("ADVISOR_GEN_WAIT_S", "10"))
+LIMITER = ratelimit.TokenBucketLimiter(RATE_PER_MIN)
+GENERATIONS = ratelimit.ConcurrencyGate(MAX_GENERATIONS, GEN_WAIT_S)
 
 LOG_DIR = os.environ.get("ADVISOR_LOG_DIR", os.path.join(CLIENT_DIR, "logs"))
 QA_LOG = os.path.join(LOG_DIR, "qa_log.jsonl")
@@ -368,11 +383,13 @@ def answer_question(question, loc=None, mentioned_now=False):
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
-    def _send(self, code, payload, close=False):
+    def _send(self, code, payload, close=False, headers=None):
         body = json.dumps(payload).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
+        for name, value in (headers or {}).items():
+            self.send_header(name, value)
         if close:
             self.send_header("Connection", "close")
         self.end_headers()
@@ -398,9 +415,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def _handle_deep_health(self):
         """Runs a real generation to verify the full pipeline: retrieval + LLM."""
+        if self._rate_limited():
+            return
         t0 = time.perf_counter()
         try:
-            answer, sources = answer_question(DEEP_HEALTH_QUESTION)
+            with GENERATIONS:
+                answer, sources = answer_question(DEEP_HEALTH_QUESTION)
+        except ratelimit.BusyError:
+            self._send(503, {"ok": False, "error": "busy", "ms": 0},
+                       headers={"Retry-After": "5"})
+            return
         except Exception as exc:
             # Log the detail, return a generic body: /health/deep is reachable
             # by token holders and used to hand them raw exception text.
@@ -431,6 +455,30 @@ class Handler(BaseHTTPRequestHandler):
             self._send(400, {"error": "invalid json"})
             return None
 
+    def _client_id(self):
+        """Identity for the rate limiter.
+
+        X-Forwarded-For is client-controlled unless a proxy overwrites it, so it
+        is only read when ADVISOR_TRUST_PROXY=1 (behind the shipped Caddyfile,
+        which sets header_up X-Forwarded-For {remote_host}).
+        """
+        if TRUST_PROXY:
+            forwarded = (self.headers.get("X-Forwarded-For") or "").split(",")[0].strip()
+            if forwarded:
+                return forwarded
+        return self.client_address[0] if self.client_address else "unknown"
+
+    def _rate_limited(self):
+        """Reply 429 with Retry-After when this identity is out of budget."""
+        allowed, retry_after = LIMITER.allow(self._client_id())
+        if allowed:
+            return False
+        # close=True for the same reason as the 401 path: an unread body poisons
+        # a pooled backend connection.
+        self._send(429, {"error": "rate limited, retry later"},
+                   close=True, headers={"Retry-After": "%d" % round(retry_after)})
+        return True
+
     def _authorized(self):
         # Fail closed: an unset or placeholder token denies every request
         # unless ADVISOR_ALLOW_ANON=1 was set deliberately for local dev.
@@ -454,6 +502,9 @@ class Handler(BaseHTTPRequestHandler):
         if not self._authorized():
             return self._send(401, {"error": "unauthorized"}, close=True)
 
+        if self._rate_limited():
+            return
+
         data = self._read_json()
         if data is None:
             return
@@ -471,7 +522,13 @@ class Handler(BaseHTTPRequestHandler):
             mentioned_now = bool(found_now)
 
         try:
-            answer, sources = answer_question(question, loc, mentioned_now)
+            # Bounded concurrency: a generation holds prompt buffers and costs
+            # money, so over the cap the request sheds instead of queueing.
+            with GENERATIONS:
+                answer, sources = answer_question(question, loc, mentioned_now)
+        except ratelimit.BusyError:
+            return self._send(503, {"error": "busy, try again shortly"},
+                              headers={"Retry-After": "5"})
         except Exception as exc:
             print("[kb-advisor] error:", exc, flush=True)
             return self._send(502, {"error": "The advisor hit an error answering that."})
@@ -502,6 +559,9 @@ class Handler(BaseHTTPRequestHandler):
     def _handle_feedback(self):
         if not self._authorized():
             return self._send(401, {"error": "unauthorized"}, close=True)
+
+        if self._rate_limited():
+            return
 
         data = self._read_json(max_len=4000)
         if data is None:

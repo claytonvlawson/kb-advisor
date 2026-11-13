@@ -1,7 +1,53 @@
 # Reverse proxy for one or more clients. Caddy terminates TLS and pools
 # backend connections; the server already handles the pooled-connection
 # 401 fix (close before reading the body).
+#
+# This file is the cheap half of the spend and pressure controls: a body cap,
+# security headers, an access log, and an honest client identity for the app's
+# own rate limiter. The app enforces the numbers that cost money.
 
 advisor.example.com {
-    reverse_proxy 127.0.0.1:8001
+    encode zstd gzip
+
+    # The app caps bodies at 10 KB (/chat) and 4 KB (/feedback). This is the
+    # backstop that also protects routes added later.
+    request_body {
+        max_size 16KB
+    }
+
+    reverse_proxy 127.0.0.1:8001 {
+        # Replace, do not append. {remote_host} is the peer address, so a
+        # client-supplied X-Forwarded-For cannot buy itself a fresh rate-limit
+        # bucket. Pair this with ADVISOR_TRUST_PROXY=1 in the service env.
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Real-IP {remote_host}
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy no-referrer
+        -Server
+    }
+
+    # Access log with rotation. The app logs questions; this logs requests.
+    log {
+        output file /var/log/caddy/kb-advisor.json {
+            roll_size 10MiB
+            roll_keep 5
+        }
+        format json
+    }
+
+    # Optional edge rate limit, for defence in depth: it needs the
+    # caddy-ratelimit plugin (build with xcaddy). The app's own limiter is the
+    # control that always exists, including for anything reaching the port.
+    # rate_limit {
+    #     zone kb_advisor {
+    #         key {remote_host}
+    #         events 30
+    #         window 1m
+    #     }
+    # }
 }

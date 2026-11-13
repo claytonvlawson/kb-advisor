@@ -104,6 +104,10 @@ writes data requires `Authorization: Bearer $ADVISOR_TOKEN`.
 | POST | `/chat` | yes | ask a question, get a cited answer |
 | POST | `/feedback` | yes | record an up/down vote on an answer id |
 
+All POST routes and `/health/deep` are rate limited per client (`429` with
+`Retry-After`), and generations are capped (`503` when saturated). See
+[Spend and pressure](#spend-and-pressure).
+
 `GET /health`
 
 ```json
@@ -229,6 +233,35 @@ invariant. If you change them, know what you are trading away.
    killed. Concurrent handlers are capped at `ADVISOR_MAX_THREADS` (8) with
    backpressure instead of unbounded threads.
 
+## Spend and pressure
+
+`/chat` costs money and each in-flight generation holds prompt buffers, so both
+are bounded in the server, not only at the edge:
+
+| setting | default | meaning |
+|---|---|---|
+| `ADVISOR_RATE_PER_MIN` | 30 | token bucket per client; `0` disables |
+| `ADVISOR_TRUST_PROXY` | off | take the client identity from `X-Forwarded-For` |
+| `ADVISOR_MAX_GENERATIONS` | 2 | concurrent generations |
+| `ADVISOR_GEN_WAIT_S` | 10 | how long a request waits for a slot before `503` |
+
+Over the bucket a request gets `429` with `Retry-After`. Over the generation cap
+it waits, then gets `503` with `Retry-After` rather than piling up threads and
+paid requests. Auth is checked first, so exhausting a bucket never becomes a way
+around the token.
+
+**Identity is the part that matters.** `X-Forwarded-For` is client-controlled
+until a proxy overwrites it, so it is only read with `ADVISOR_TRUST_PROXY=1`,
+and the shipped `deploy/Caddyfile` sets `header_up X-Forwarded-For
+{remote_host}` (replace, not append). Without that, a client could mint a fresh
+bucket per request by changing a header, which would make the limiter decoration.
+
+`deploy/Caddyfile` also caps request bodies at 16 KB, sets HSTS and the usual
+headers, and logs access with rotation. An edge rate limit is included but
+commented out, because it needs the `caddy-ratelimit` plugin; the app's limiter
+is the control that always exists, including for anything talking to the port
+directly.
+
 ## Logs and retention
 
 Three JSONL files per client (`qa_log`, `feedback`, `crisis_log`) hold questions,
@@ -336,7 +369,7 @@ edge function (Vercel/Netlify), never in the browser.
 
 ## Tests
 
-117 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
+131 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
 the HTTP surface is exercised over a real socket on an ephemeral port.
 
 ```sh
@@ -356,6 +389,7 @@ python -m pytest
 | `tests/test_regex_safety.py` | risky crisis patterns rejected at startup, match bounded, detector disabled after a timeout, handler cap holds |
 | `tests/test_crisis_set.py` | the labelled set is well formed and the detector still clears its recall and precision floors |
 | `tests/test_logs.py` | redaction modes, rotation bounds, age-based pruning, and a live `/feedback` write whose note is scrubbed |
+| `tests/test_ratelimit.py` | bucket refill and deny, bounded identity tracking, generation shedding, `429`/`503` shapes, and that a spoofed `X-Forwarded-For` buys nothing |
 | `scripts/eval_crisis.py` | CI gate: measures recall and precision against the labelled set |
 
 CI runs the suite on Python 3.11 and 3.12 (`.github/workflows/tests.yml`).
