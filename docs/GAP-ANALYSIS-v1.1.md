@@ -120,6 +120,16 @@ scripted client can saturate.
 
 ### 4. Logs hold user text forever and grow without bound
 
+**Status: bounded, redacted on write, and the crisis loop is opened.** `kb/logio.py`
+adds size rotation (5 MB, 3 backups), a 30 day retention on rotated files, and four
+redaction modes for `question`, `answer` and `note` with `redact` as the default.
+`scripts/crisis_review.py` exports `crisis_log.jsonl` into unlabelled candidates and
+refuses to run without `--consent`, so the crisis set can grow from real phrasing
+without turning log text into training data by accident. 18 tests in
+`tests/test_logs.py`, including a live `/feedback` write whose phone number is
+scrubbed before it reaches disk. Known limit stated in the README: redaction removes
+identifiers, not sensitivity, so the retention window is the real control.
+
 `_append_jsonl` appends full question, full answer and citations to
 `clients/<name>/logs/qa_log.jsonl`, and crisis hits to `crisis_log.jsonl`. There is
 no rotation, no retention, no redaction and no delete path. For an audience of

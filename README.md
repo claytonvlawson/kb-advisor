@@ -187,33 +187,39 @@ invariant. If you change them, know what you are trading away.
    loosening the contract -- loosening it trades a safety bug for a
    hallucination surface across the whole corpus.
 
-3. **Formatting invariants live in code, not prompts.** Em dashes are stripped
+3. **Logs are bounded and redacted on write.** Rotation, retention and
+   redaction live in `kb/logio.py`, not in a cron job someone has to remember.
+   The default mode strips emails, phone numbers, long digit runs, URLs with
+   query strings and @handles; `full` is an opt-in that needs a notice and
+   consent, `hash` and `none` exist for stricter deployments.
+
+4. **Formatting invariants live in code, not prompts.** Em dashes are stripped
    by regex post-processing because models drop prompt instructions under
    real traffic. Any rule that must hold 100% of the time belongs in
    post-processing.
 
-4. **A paper quoted in-text always appears in citations.**
+5. **A paper quoted in-text always appears in citations.**
    `citations.build_citations_grounded` force-merges any retrieved source the
    answer names verbatim, plus vault-wide author-year/person matches, so the
    citation list is guaranteed to reference what the answer actually said.
    The prompt clause is a hint; the code-side merge is the guarantee.
 
-5. **Corpus shape is a retrieval parameter.** Short (<=63 line), heading
+6. **Corpus shape is a retrieval parameter.** Short (<=63 line), heading
    dense, alias-rich notes retrieve better than a long one; the ingest script
    promotes PDF headings so the chunker has structure to work with. The
    220-word heading-aware chunker has no overlap by design -- it relies on
    the notes being short and heading dense.
 
-6. **Never assume the user's location/context.** Retrieved examples are
+7. **Never assume the user's location/context.** Retrieved examples are
    examples. The persona clause (and the example client's hooks) keep
    another state's phone numbers out of the answer.
 
-7. **BM25 only, no dense half.** A 1GB VM with no GPU serves this. The known
+8. **BM25 only, no dense half.** A 1GB VM with no GPU serves this. The known
    cost is vocabulary-gap recall (a user's words may share zero tokens with
    the corpus's words); aliases and `system_prompt.md` routing pay for most
    of it.
 
-8. **Client regexes are validated, and every match is bounded.** `crisis.json`
+9. **Client regexes are validated, and every match is bounded.** `crisis.json`
    is config, and `re.search` has no timeout, so a pattern like
    `(\w+\s?)+[.!?]` is a denial of service rather than a safeguard (7 ms at 16
    characters, 951 ms at 24). `kb/regex_safety.py` refuses provably risky
@@ -222,6 +228,48 @@ invariant. If you change them, know what you are trading away.
    detector for the process with a CRITICAL log, because a thread cannot be
    killed. Concurrent handlers are capped at `ADVISOR_MAX_THREADS` (8) with
    backpressure instead of unbounded threads.
+
+## Logs and retention
+
+Three JSONL files per client (`qa_log`, `feedback`, `crisis_log`) hold questions,
+answers and your feedback notes. `kb/logio.py` bounds every one of them:
+
+| setting | default | meaning |
+|---|---|---|
+| `ADVISOR_LOG_MAX_BYTES` | 5 MB | rotate before a file grows past this |
+| `ADVISOR_LOG_BACKUPS` | 3 | keep this many rotated generations (20 MB per log at the defaults) |
+| `ADVISOR_LOG_RETENTION_DAYS` | 30 | delete rotated files older than this, checked at most every 5 minutes |
+| `ADVISOR_LOG_QUESTION` | `redact` | what is written for `question`, `answer` and `note` |
+
+Modes: `redact` (default) strips emails, phone numbers, card and long digit runs,
+URLs with query strings and @handles; `full` stores the text verbatim and needs a
+notice plus consent; `hash` stores a `sha256:` prefix and length with no text;
+`none` stores nothing.
+
+**The retention window, not the redaction, is the real limit on exposure.** The
+server keeps the id on every row so a feedback vote still correlates with an
+answer after the text is gone. Set `ADVISOR_LOG_QUESTION=hash` if you do not need
+to read questions back, and state your own retention period in your privacy
+notice.
+
+### Growing the crisis set from real traffic
+
+`crisis_log.jsonl` is the useful signal: it is every question the trigger fired
+on. Turning it into eval data is a deliberate, two-step act:
+
+```sh
+python3 scripts/crisis_review.py \
+  --log clients/example-parent-advisor/logs/crisis_log.jsonl \
+  --out eval/candidates.jsonl \
+  --consent "approved by <who>, question text is redacted"
+```
+
+The script refuses without `--consent`, redacts before writing, drops
+near-duplicates and questions already in the labelled set, and writes every row
+with an **empty label**. A person decides crisis versus idiom versus ordinary
+distress, then appends the sure ones to `eval/crisis_set.jsonl` and re-runs the
+eval. Nothing is auto-labelled: that would only re-teach the detector what it
+already believes.
 
 ## Crisis eval
 
@@ -288,7 +336,7 @@ edge function (Vercel/Netlify), never in the browser.
 
 ## Tests
 
-99 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
+117 tests, offline, no model calls, about 3 seconds. `requests.post` is faked and
 the HTTP surface is exercised over a real socket on an ephemeral port.
 
 ```sh
@@ -307,6 +355,7 @@ python -m pytest
 | `tests/test_hooks.py` | the example client's US-state routing |
 | `tests/test_regex_safety.py` | risky crisis patterns rejected at startup, match bounded, detector disabled after a timeout, handler cap holds |
 | `tests/test_crisis_set.py` | the labelled set is well formed and the detector still clears its recall and precision floors |
+| `tests/test_logs.py` | redaction modes, rotation bounds, age-based pruning, and a live `/feedback` write whose note is scrubbed |
 | `scripts/eval_crisis.py` | CI gate: measures recall and precision against the labelled set |
 
 CI runs the suite on Python 3.11 and 3.12 (`.github/workflows/tests.yml`).
@@ -335,8 +384,11 @@ Not done, in rough priority order:
    8k chunks).
 3. **BM25 only.** No embeddings, by design (a 1 GB box with no GPU serves this).
    The cost is vocabulary-gap recall.
-4. **No log retention policy.** `qa_log.jsonl` stores full question text
-   indefinitely; decide retention before pointing this at real users.
+4. **Logs are bounded and redacted, but redaction is not anonymisation.** Size
+   rotation (5 MB x 4), a 30 day retention on rotated files and identifier
+   stripping are in place. Names and free-text detail still survive, so the
+   retention window is the real limit; set `ADVISOR_LOG_QUESTION=hash` or `none`
+   if you do not need the text back.
 5. **No streaming.** Answers arrive whole; long generations block until done.
 6. **One deployment topology.** No container image, no Terraform; the deploy
    section is rsync plus systemd.

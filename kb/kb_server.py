@@ -75,6 +75,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 # This file lives inside kb/, so plain imports work when run as a script.
 import citations
 import llm_router
+import logio
 import regex_safety
 import retrieval
 
@@ -223,16 +224,29 @@ print("Client config: %s" % CLIENT_DIR, flush=True)
 print("Logging exchanges to %s" % QA_LOG, flush=True)
 
 _log_lock = threading.Lock()
+_LOG_OBJECTS = {}
+
+
+def _log_for(path):
+    """One JsonlLog per path, created on first write.
+
+    Lazy on purpose: the path constants above are patched by the test fixtures,
+    and rotation, retention and redaction limits are read at first write, so a
+    deployment can change ADVISOR_LOG_* between restarts without touching code.
+    """
+    log = _LOG_OBJECTS.get(path)
+    if log is None:
+        with _log_lock:
+            log = _LOG_OBJECTS.get(path)
+            if log is None:
+                log = logio.from_env("ADVISOR_LOG", path)
+                _LOG_OBJECTS[path] = log
+    return log
 
 
 def _append_jsonl(path, record):
-    try:
-        line = json.dumps(record, ensure_ascii=False)
-        with _log_lock:
-            with open(path, "a", encoding="utf-8") as fh:
-                fh.write(line + "\n")
-    except Exception as exc:
-        print("[kb-advisor] could not write log %s: %s" % (path, exc), flush=True)
+    """Append one record: rotation, retention and redaction live in logio."""
+    return _log_for(path).append(record)
 
 
 # ---------------------------------------------------------------------------
