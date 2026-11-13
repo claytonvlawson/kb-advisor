@@ -1,6 +1,6 @@
 [project]
 name = "kb-advisor"
-version = "1.1.1"
+version = "1.2.0"
 description = "Template RAG advisor: drop in client PDFs, get a cited, safety-routed knowledge-base API"
 requires-python = ">=3.10"
 dependencies = ["requests>=2.31", "rank_bm25>=0.2.2"]

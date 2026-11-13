@@ -16,7 +16,9 @@ ENV_EXAMPLE = os.path.join(ROOT, "deploy", "kb.env.example")
 
 
 def parse_unit():
-    parser = configparser.ConfigParser(strict=False)
+    # interpolation=None: systemd uses %i as an instance specifier, and
+    # configparser would otherwise fail on '%i.env'
+    parser = configparser.ConfigParser(strict=False, interpolation=None)
     parser.optionxform = str          # systemd keys are case-sensitive
     with open(UNIT) as fh:
         parser.read_file(fh)
@@ -57,6 +59,56 @@ class TestUnitHardening:
     def test_start_is_gated_on_health(self):
         unit = parse_unit()["Service"]
         assert unit["ExecStartPost"].endswith("wait_for_health.sh")
+
+
+class TestMultiClientTopology:
+    """One process per client is the supported topology; the unit is templated."""
+
+    TEMPLATE = os.path.join(ROOT, "deploy", "kb-advisor@.service")
+    SLICE = os.path.join(ROOT, "deploy", "kb-advisor.slice")
+
+    def parse(self, path):
+        parser = configparser.ConfigParser(strict=False, interpolation=None)
+        parser.optionxform = str
+        with open(path) as fh:
+            parser.read_file(fh)
+        return parser
+
+    def test_template_unit_exists_and_is_instance_parameterised(self):
+        assert os.path.exists(self.TEMPLATE), "no templated unit for N clients"
+        unit = self.parse(self.TEMPLATE)["Service"]
+        assert "%i" in unit["EnvironmentFile"], "the env file must follow the instance name"
+        assert "%i" in unit["ReadWritePaths"], "each instance needs its own writable log dir"
+
+    def test_template_keeps_the_same_hardening(self):
+        unit = self.parse(self.TEMPLATE)["Service"]
+        for key in ("NoNewPrivileges", "PrivateTmp", "PrivateDevices",
+                    "ProtectSystem", "ProtectHome", "RestrictNamespaces"):
+            assert unit.get(key) not in (None, "no", "false"), key
+        assert unit["Restart"] == "always"
+        assert unit["ExecStartPost"].endswith("wait_for_health.sh")
+
+    def test_both_units_are_inside_the_bounded_slice(self):
+        """A per-unit MemoryMax does not bound the sum of all instances."""
+        for path in (UNIT, self.TEMPLATE):
+            unit = self.parse(path)["Service"]
+            assert unit.get("Slice") == "kb-advisor.slice", path
+        assert os.path.exists(self.SLICE), "no slice means no collective ceiling"
+
+    def test_slice_caps_the_total_not_just_each_instance(self):
+        slice_cfg = self.parse(self.SLICE)["Slice"]
+        total = int(re.sub(r"\D", "", slice_cfg["MemoryMax"]))
+        per_unit = int(re.sub(r"\D", "", self.parse(UNIT)["Service"]["MemoryMax"]))
+        assert total < per_unit * 2, (
+            "the slice (%s) must be tighter than two full instances (%s each)"
+            % (slice_cfg["MemoryMax"], per_unit))
+
+    def test_readme_states_the_topology_and_the_non_goal(self):
+        readme = open(os.path.join(ROOT, "README.md")).read()
+        assert "One process per client" in readme
+        assert "kb-advisor@" in readme, "the templated unit is not documented"
+        assert "not built" in readme, "the multi-tenant non-goal is not stated"
+        assert "300 MB" in readme, "the memory arithmetic is not stated"
 
 
 class TestUnitAndAppAgree:

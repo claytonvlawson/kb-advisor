@@ -5,6 +5,26 @@ existing `clients/<name>/` config (a crisis pattern the guard now rejects, a
 retired env var, a changed response field) bumps the minor version, because a
 deployment that upgrades in place is the normal case for a template.
 
+## 1.2.0 (2026-11-12)
+
+**Multi-client is now a documented, supported topology.**
+
+- `deploy/kb-advisor@.service`: template unit where the instance name is the
+  client id, with a per-instance env file and log directory. One process per
+  client, so isolation is the kernel boundary rather than a tenant check.
+- `deploy/kb-advisor.slice`: a collective memory ceiling (750M). Per-unit
+  `MemoryMax` does not bound the sum, and three instances at 800M each can still
+  OOM a 1 GB box.
+- `deploy/Caddyfile`: the one-site-per-client pattern, with a reusable snippet
+  so each client gets its own certificate, headers and access log.
+- README: the topology, the arithmetic (~300 MB per instance with an 8k-chunk
+  index, so two clients on 1 GB), and the explicit **non-goal**: in-process
+  multi-tenancy. The indexes dominate memory so a token map buys nothing there,
+  and it would trade an OS boundary for a code path somebody has to audit.
+- Tests: template parameterisation (`%i` in env file and log path), hardening
+  parity with the single-instance unit, the slice being tighter than two
+  instances, and the README stating both the topology and the non-goal.
+
 ## 1.1.1 (2026-11-12)
 
 Developer tooling only: no behaviour change for a deployment.

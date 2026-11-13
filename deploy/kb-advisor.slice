@@ -1,0 +1,16 @@
+[Unit]
+Description=KB Advisor instances (one process per client)
+
+[Slice]
+# The collective ceiling. A per-unit MemoryMax does NOT bound the sum: three
+# instances each allowed 800M can still take 2.4G and OOM a 1 GB box. The slice
+# is the number that actually holds.
+#
+# Sizing: service RSS is ~300 MB per instance with an 8k-chunk BM25 index. On a
+# 1 GB box, leave the kernel and Caddy ~250 MB, so ~750 MB is the honest
+# budget and that is two instances. Use a bigger box before adding a third, and
+# raise this number with it.
+MemoryAccounting=true
+MemoryHigh=650M
+MemoryMax=750M
+TasksMax=256

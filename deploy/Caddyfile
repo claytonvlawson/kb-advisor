@@ -51,3 +51,32 @@ advisor.example.com {
     #     }
     # }
 }
+
+# Serving more than one client: one site block per client, each pointed at that
+# instance's port. Nothing crosses between them at the proxy layer either, and
+# every client gets its own certificate, headers and access log.
+#
+# acme.example.com {
+#     import kb_site 8002
+# }
+# beta.example.com {
+#     import kb_site 8003
+# }
+#
+# (kb_site) {
+#     encode zstd gzip
+#     request_body {
+#         max_size 16KB
+#     }
+#     reverse_proxy 127.0.0.1:{args[0]} {
+#         header_up X-Forwarded-For {remote_host}
+#         header_up X-Real-IP {remote_host}
+#     }
+#     header {
+#         Strict-Transport-Security "max-age=31536000; includeSubDomains"
+#         X-Content-Type-Options nosniff
+#         X-Frame-Options DENY
+#         Referrer-Policy no-referrer
+#         -Server
+#     }
+# }

@@ -389,6 +389,42 @@ Check it on the host with `systemd-analyze verify deploy/kb-advisor.service`
 before restarting. `tests/test_deploy.py` asserts the hardening is still in the
 file and that the unit and the app agree on the log path.
 
+### Serving more than one client
+
+**One process per client is the supported topology, and it is the only one.**
+`deploy/kb-advisor@.service` is a template unit where the instance name is the
+client id:
+
+```sh
+sudo rsync -az clients/acme/ /opt/kb-advisor/clients/acme/
+sudo install -m 600 deploy/acme.env.example /etc/kb-advisor/acme.env   # ADVISOR_CLIENT + ADVISOR_PORT
+sudo systemctl enable --now kb-advisor@acme
+```
+
+Each instance gets its own `ADVISOR_CLIENT`, port, `ADVISOR_TOKEN`, index in
+RAM, log directory and crash domain. Isolation is the OS boundary, not a tenant
+check in application code. `deploy/Caddyfile` shows the matching one-site-per-
+client pattern (its own certificate, headers and access log).
+
+**Size the box before adding a client.** Service RSS is about 300 MB per
+instance with an 8k-chunk index, and the indexes are the cost. `deploy/kb-advisor.slice`
+bounds the instances collectively at 750 MB, which is two clients on a 1 GB box
+with ~250 MB left for the kernel and Caddy. A per-unit `MemoryMax` does not
+bound the sum: three instances allowed 800 MB each can still take 2.4 GB and
+OOM the machine. Add a third client by adding RAM first, and raise the slice
+with it.
+
+**What is deliberately not built:** multi-tenancy in one process. A per-client
+token map would mean threading a tenant through `CLIENT_DIR`, `VAULT_ROOT`,
+`INDEX_PATH`, `LOG_DIR`, `SYSTEM_PROMPT`, `CRISIS_CFG`, `HOOKS`, `CHUNKS` and
+`BM25`, all currently module-level, plus one resident index per client anyway.
+The memory does not improve, and isolation moves from the kernel to a code path
+somebody has to audit. For a corpus of client documents that is strictly worse.
+
+Token rotation stays per instance: issue a new `ADVISOR_TOKEN` in that client's
+env file and `systemctl restart kb-advisor@<client>`. One client's rotation does
+not restart anybody else.
+
 Index load takes ~5s; poll `/health` after restart rather than curling once.
 Set the environment file chmod 600. Put the front end's bearer token in the
 edge function (Vercel/Netlify), never in the browser.
@@ -401,7 +437,7 @@ the HTTP surface is exercised over a real socket on an ephemeral port.
 ```sh
 python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements-dev.txt
-python -m pytest --cov            # 157 tests, coverage floor from pyproject
+python -m pytest --cov            # 162 tests, coverage floor from pyproject
 ruff check kb ingest scripts tests
 mypy                              # kb/ only, configured in pyproject
 ```

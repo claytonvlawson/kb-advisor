@@ -231,6 +231,21 @@ No `SECURITY.md`, `CONTRIBUTING.md`, or issue templates. Anyone who finds a hole
 
 ### 11. Multi-client operations are undefined
 
+**Status: one process per client, documented, templated and bounded.**
+`deploy/kb-advisor@.service` takes the client id as its instance name, with a
+per-instance env file and log directory, so isolation is the kernel boundary rather
+than a tenant check in application code. `deploy/kb-advisor.slice` adds the collective
+memory ceiling that per-unit `MemoryMax` cannot provide (750M, which is two instances
+on a 1 GB box at ~300 MB each). The Caddyfile shows the one-site-per-client pattern, so
+each client gets its own certificate, headers and access log. Token rotation is per
+instance: change that client's env file and restart that unit.
+
+In-process multi-tenancy is an explicit non-goal, with the reasoning written down: the
+indexes dominate memory, so a per-client token map buys nothing there, and it trades an
+OS boundary for a code path somebody has to audit, on a corpus of client documents.
+`tests/test_deploy.py` asserts the template stays parameterised and the slice stays
+tighter than two instances.
+
 One process serves one client, selected by `ADVISOR_CLIENT`, and auth is a single
 global `ADVISOR_TOKEN`. Serving five clients means five units and five tokens that
 must not be confused, and any deployment that reuses a token exposes every client

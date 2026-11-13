@@ -1,0 +1,64 @@
+[Unit]
+Description=KB Advisor for client %i (BM25 + OpenRouter, per-client persona)
+Documentation=https://github.com/claytonvlawson/kb-advisor
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+# Templated unit: the instance name IS the client id.
+#
+#   sudo cp clients/acme -r /opt/kb-advisor/clients/acme
+#   sudo cp /etc/kb-advisor/acme.env.example /etc/kb-advisor/acme.env   # ADVISOR_CLIENT=/opt/kb-advisor/clients/acme, ADVISOR_PORT=8002
+#   sudo systemctl enable --now kb-advisor@acme
+#
+# One process per client is the supported topology. Isolation is the OS
+# boundary (address space, memory accounting, crash domain, log directory), not
+# a tenant check in application code. See "Serving more than one client".
+Type=exec
+User=kb-advisor
+Group=kb-advisor
+WorkingDirectory=/opt/kb-advisor
+EnvironmentFile=/etc/kb-advisor/%i.env
+Slice=kb-advisor.slice
+
+ExecStart=/usr/bin/python3 /opt/kb-advisor/kb/kb_server.py
+ExecStartPost=/opt/kb-advisor/deploy/wait_for_health.sh
+
+Restart=always
+RestartSec=3
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+SystemCallArchitectures=native
+UMask=0077
+
+# Per-instance log directory, and it MUST match ADVISOR_LOG_DIR in that
+# instance's env file. A mismatch starts the service and silently drops logs.
+ReadWritePaths=/var/lib/kb-advisor/%i
+
+# Per-instance ceilings. The slice above bounds the total, which is what stops
+# three clients from collectively eating a 1 GB box even though each one is
+# individually under its own MemoryMax.
+MemoryAccounting=true
+MemoryHigh=600M
+MemoryMax=800M
+
+TasksMax=64
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
